@@ -18,6 +18,7 @@ interface Goal {
 export function GoalCard({ goal, onMutate }: { goal: Goal; onMutate: () => void }) {
   const [depositing, setDepositing] = useState(false);
   const [amount, setAmount] = useState("");
+  const [depositError, setDepositError] = useState("");
   const [editing, setEditing] = useState(false);
   const [editData, setEditData] = useState({
     name: goal.name,
@@ -40,11 +41,17 @@ export function GoalCard({ goal, onMutate }: { goal: Goal; onMutate: () => void 
     : "bg-rose-400";
 
   const handleDeposit = async () => {
-    if (!amount) return;
-    await apiClient.depositGoal(goal.id, parseFloat(amount));
-    onMutate();
-    setDepositing(false);
-    setAmount("");
+    const parsed = parseFloat(amount);
+    if (!amount || isNaN(parsed) || parsed <= 0) return;
+    setDepositError("");
+    try {
+      await apiClient.depositGoal(goal.id, parsed);
+      onMutate();
+      setDepositing(false);
+      setAmount("");
+    } catch (e: any) {
+      setDepositError(e.message || "Deposit failed");
+    }
   };
 
   const handleSaveEdit = async () => {
@@ -162,22 +169,25 @@ export function GoalCard({ goal, onMutate }: { goal: Goal; onMutate: () => void 
       {/* Deposit */}
       {!isComplete && !editing && (
         depositing ? (
-          <div className="flex gap-2">
-            <input
-              type="number"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              onKeyDown={(e) => { if (e.key === "Enter") handleDeposit(); }}
-              placeholder="Amount to deposit"
-              className="flex-1 border border-slate-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white"
-              autoFocus
-            />
-            <button onClick={handleDeposit} className="px-3 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-sm font-medium transition-colors">
-              Save
-            </button>
-            <button onClick={() => setDepositing(false)} className="px-3 py-2 border border-slate-200 rounded-xl text-sm text-slate-600 hover:bg-slate-50 transition-colors">
-              Cancel
-            </button>
+          <div className="space-y-1.5">
+            <div className="flex gap-2">
+              <input
+                type="number"
+                value={amount}
+                onChange={(e) => { setAmount(e.target.value); setDepositError(""); }}
+                onKeyDown={(e) => { if (e.key === "Enter") handleDeposit(); }}
+                placeholder="Amount to deposit"
+                className="flex-1 border border-slate-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white"
+                autoFocus
+              />
+              <button onClick={handleDeposit} className="px-3 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-sm font-medium transition-colors">
+                Save
+              </button>
+              <button onClick={() => { setDepositing(false); setDepositError(""); }} className="px-3 py-2 border border-slate-200 rounded-xl text-sm text-slate-600 hover:bg-slate-50 transition-colors">
+                Cancel
+              </button>
+            </div>
+            {depositError && <p className="text-rose-500 text-xs">{depositError}</p>}
           </div>
         ) : (
           <button onClick={() => setDepositing(true)} className="flex items-center gap-1.5 text-sm font-medium text-brand-600 hover:text-brand-700 transition-colors">
