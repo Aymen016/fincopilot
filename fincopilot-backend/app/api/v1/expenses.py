@@ -1,8 +1,7 @@
-import json
-from uuid import uuid4, UUID
+from uuid import UUID
 from datetime import date
 from typing import Annotated
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, BackgroundTasks, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
@@ -10,9 +9,8 @@ from app.dependencies import get_current_user, Pagination
 from app.models.user import User
 from app.repositories.expense_repo import ExpenseRepository
 from app.repositories.insight_repo import InsightRepository
-from app.schemas.expense import ExpenseCreate, ExpenseUpdate, ExpenseResponse, CategoryCorrectionRequest, BulkUploadResponse, JobStatusResponse
+from app.schemas.expense import ExpenseCreate, ExpenseUpdate, ExpenseResponse
 from app.services.expense_service import ExpenseService
-from app.utils.redis_client import get_redis
 
 router = APIRouter(prefix="/expenses", tags=["expenses"])
 
@@ -79,33 +77,3 @@ async def delete_expense(
         raise HTTPException(status_code=404, detail="Expense not found")
     await InsightRepository(db).invalidate_for_user(current_user.id)
 
-
-@router.post("/bulk", response_model=BulkUploadResponse)
-async def upload_csv(
-    file: UploadFile = File(...),
-    background_tasks: BackgroundTasks = BackgroundTasks(),
-    current_user: User = Depends(get_current_user),
-):
-    job_id = str(uuid4())
-    content = await file.read()
-
-    redis = await get_redis()
-    await redis.set(
-        f"job:{job_id}",
-        json.dumps({"status": "queued", "progress": 0, "created": 0, "failed": 0, "errors": []}),
-        ex=3600,
-    )
-
-    from app.tasks.generate_insights import process_csv_import
-    process_csv_import.delay(job_id, str(current_user.id), content.decode("utf-8", errors="replace"))
-
-    return BulkUploadResponse(job_id=job_id, status="queued")
-
-
-@router.get("/jobs/{job_id}", response_model=JobStatusResponse)
-async def get_job_status(job_id: str):
-    redis = await get_redis()
-    data = await redis.get(f"job:{job_id}")
-    if not data:
-        raise HTTPException(status_code=404, detail="Job not found")
-    return JobStatusResponse(**json.loads(data))
