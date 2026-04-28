@@ -1,0 +1,135 @@
+"use client";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { apiClient } from "@/lib/api";
+import { useAuthStore } from "@/lib/store/auth";
+import { TrendingUp, ShieldCheck, Sparkles, Target } from "lucide-react";
+
+const schema = z.object({
+  email: z.string().email(),
+  password: z.string().min(6),
+});
+type FormData = z.infer<typeof schema>;
+
+const FEATURES = [
+  { icon: Sparkles, text: "AI-powered spending insights" },
+  { icon: Target, text: "Smart savings goal tracking" },
+  { icon: ShieldCheck, text: "Budget alerts before you overspend" },
+];
+
+export default function LoginPage() {
+  const router = useRouter();
+  const setTokens = useAuthStore((s) => s.setTokens);
+  const [error, setError] = useState("");
+
+  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormData>({
+    resolver: zodResolver(schema),
+  });
+
+  const onSubmit = async (data: FormData) => {
+    setError("");
+    try {
+      const res = await apiClient.login(data.email, data.password);
+      setTokens(res.access_token, res.refresh_token);
+      router.push("/dashboard");
+    } catch (e: any) {
+      setError(e.message || "Login failed");
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex">
+      {/* Left: brand panel */}
+      <div className="hidden lg:flex lg:w-5/12 bg-gradient-to-br from-brand-700 via-brand-600 to-violet-700 flex-col items-center justify-center p-12 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full bg-white blur-3xl" />
+          <div className="absolute bottom-1/4 right-1/4 w-48 h-48 rounded-full bg-white blur-3xl" />
+        </div>
+        <div className="relative z-10 text-white max-w-xs">
+          <div className="w-14 h-14 bg-white/20 backdrop-blur rounded-2xl flex items-center justify-center mb-8 shadow-lg">
+            <TrendingUp size={28} className="text-white" />
+          </div>
+          <h2 className="text-3xl font-bold mb-3 leading-tight">Your money, under control</h2>
+          <p className="text-brand-200 mb-10 leading-relaxed">
+            AI-powered insights that help you spend smarter and save faster.
+          </p>
+          <ul className="space-y-4">
+            {FEATURES.map(({ icon: Icon, text }) => (
+              <li key={text} className="flex items-center gap-3 text-brand-100 text-sm">
+                <div className="w-7 h-7 rounded-lg bg-white/15 flex items-center justify-center flex-shrink-0">
+                  <Icon size={14} className="text-white" />
+                </div>
+                {text}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+      {/* Right: form */}
+      <div className="flex-1 flex items-center justify-center p-8 bg-white">
+        <div className="w-full max-w-sm animate-slide-up">
+          <div className="mb-8">
+            <div className="flex items-center gap-2 mb-6 lg:hidden">
+              <div className="w-7 h-7 bg-brand-600 rounded-lg flex items-center justify-center">
+                <TrendingUp size={14} className="text-white" />
+              </div>
+              <span className="font-bold text-slate-900">FinCopilot</span>
+            </div>
+            <h1 className="text-2xl font-bold text-slate-900">Welcome back</h1>
+            <p className="text-slate-500 text-sm mt-1">Sign in to your account</p>
+          </div>
+
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">Email</label>
+              <input
+                {...register("email")}
+                type="email"
+                className="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition bg-white"
+                placeholder="you@example.com"
+              />
+              {errors.email && <p className="text-rose-500 text-xs mt-1">{errors.email.message}</p>}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">Password</label>
+              <input
+                {...register("password")}
+                type="password"
+                className="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition bg-white"
+                placeholder="••••••••"
+              />
+              {errors.password && <p className="text-rose-500 text-xs mt-1">{errors.password.message}</p>}
+            </div>
+
+            {error && (
+              <div className="bg-rose-50 border border-rose-200 rounded-xl px-3.5 py-2.5">
+                <p className="text-rose-600 text-sm">{error}</p>
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full bg-brand-600 hover:bg-brand-700 text-white font-medium py-2.5 rounded-xl transition-colors disabled:opacity-60 shadow-sm"
+            >
+              {isSubmitting ? "Signing in…" : "Sign in"}
+            </button>
+          </form>
+
+          <p className="text-center text-sm text-slate-500 mt-6">
+            Don&apos;t have an account?{" "}
+            <Link href="/register" className="text-brand-600 font-medium hover:text-brand-700">
+              Create one free
+            </Link>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}

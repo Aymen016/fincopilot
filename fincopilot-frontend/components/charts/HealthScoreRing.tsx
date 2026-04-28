@@ -1,0 +1,59 @@
+"use client";
+
+interface Props {
+  score: number;
+  grade: string;
+  trend: string;
+}
+
+export function HealthScoreRing({ score, grade, trend }: Props) {
+  const radius = 52;
+  const circumference = 2 * Math.PI * radius;
+  const clampedScore = Math.max(0, Math.min(100, score));
+  const strokeDashoffset = circumference - (clampedScore / 100) * circumference;
+
+  const { color, glow, label } =
+    clampedScore >= 80
+      ? { color: "#22c55e", glow: "#22c55e33", label: "Excellent" }
+      : clampedScore >= 65
+      ? { color: "#6366f1", glow: "#6366f133", label: "Good" }
+      : clampedScore >= 50
+      ? { color: "#f59e0b", glow: "#f59e0b33", label: "Fair" }
+      : { color: "#ef4444", glow: "#ef444433", label: "Needs work" };
+
+  return (
+    <div className="flex flex-col items-center">
+      <div className="relative w-36 h-36">
+        {/* Glow behind ring */}
+        <div
+          className="absolute inset-2 rounded-full blur-md opacity-40"
+          style={{ backgroundColor: glow }}
+        />
+        <svg viewBox="0 0 120 120" className="w-full h-full -rotate-90 relative z-10">
+          <circle
+            cx="60" cy="60" r={radius}
+            fill="none"
+            stroke="#e2e8f0"
+            strokeWidth="9"
+          />
+          <circle
+            cx="60" cy="60" r={radius}
+            fill="none"
+            stroke={color}
+            strokeWidth="9"
+            strokeLinecap="round"
+            strokeDasharray={circumference}
+            strokeDashoffset={strokeDashoffset}
+            style={{ transition: "stroke-dashoffset 1s cubic-bezier(0.4, 0, 0.2, 1)" }}
+          />
+        </svg>
+        <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
+          <span className="text-3xl font-bold text-slate-900">{clampedScore}</span>
+          <span className="text-sm font-bold" style={{ color }}>{grade}</span>
+        </div>
+      </div>
+      <p className="text-xs font-medium mt-2" style={{ color }}>{label}</p>
+      <p className="text-xs text-slate-400 mt-0.5">{trend}</p>
+    </div>
+  );
+}
