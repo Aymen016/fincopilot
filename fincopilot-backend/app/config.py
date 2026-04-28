@@ -12,8 +12,11 @@ class Settings(BaseSettings):
     refresh_token_expire_days: int = 7
     algorithm: str = "HS256"
 
-    # Database
-    database_url: str = "postgresql+asyncpg://fincopilot:fincopilot_secret@localhost:5432/fincopilot"
+    # Database (local default uses SQLite; set DATABASE_URL env var in production)
+    database_url: str = "sqlite+aiosqlite:///./fincopilot.db"
+
+    # CORS — comma-separated allowed origins
+    allowed_origins: str = "http://localhost:3000"
 
     # Redis / Celery
     redis_url: str = "redis://localhost:6379/0"
