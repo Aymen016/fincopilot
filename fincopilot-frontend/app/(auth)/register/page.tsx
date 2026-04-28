@@ -49,7 +49,7 @@ export default function RegisterPage() {
     setVerifying(true);
     setError("");
     try {
-      const tokens = await apiClient.verifyEmail(pendingEmail, code);
+      const tokens = await apiClient.verifyEmail(pendingEmail, code) as { access_token: string; refresh_token: string };
       localStorage.setItem("access_token", tokens.access_token);
       localStorage.setItem("refresh_token", tokens.refresh_token);
       router.push("/dashboard");
