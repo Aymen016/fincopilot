@@ -5,12 +5,8 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc libpq-dev curl && rm -rf /var/lib/apt/lists/*
 
-# Install CPU-only torch BEFORE sentence-transformers so pip reuses it
-RUN pip install --no-cache-dir --retries 5 --timeout 120 \
-    torch --index-url https://download.pytorch.org/whl/cpu
-
 COPY requirements.txt ./
-RUN pip install --no-cache-dir --retries 5 --timeout 120 -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
