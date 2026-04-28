@@ -95,7 +95,7 @@ export const apiClient = {
   updateGoal: (id: string, data: any) => request(`/goals/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
   deleteGoal: (id: string) => request(`/goals/${id}`, { method: "DELETE" }),
   depositGoal: (id: string, amount: number, note?: string) =>
-    request(`/goals/${id}/deposit`, { method: "PATCH", body: JSON.stringify({ amount, note }) }),
+    request(`/goals/${id}/deposit`, { method: "POST", body: JSON.stringify({ amount, note }) }),
   getGoalPlan: (id: string) => request<any>(`/goals/${id}/plan`),
 
   // Insights
