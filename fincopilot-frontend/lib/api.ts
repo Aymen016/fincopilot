@@ -50,6 +50,9 @@ export const apiClient = {
   register: (full_name: string, email: string, password: string) =>
     request("/auth/register", { method: "POST", body: JSON.stringify({ full_name, email, password }) }),
 
+  verifyEmail: (email: string, code: string) =>
+    request("/auth/verify-email", { method: "POST", body: JSON.stringify({ email, code }) }),
+
   // Expenses
   getExpenses: (params: Record<string, any> = {}) => {
     const qs = new URLSearchParams(

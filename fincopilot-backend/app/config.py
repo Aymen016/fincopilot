@@ -27,6 +27,10 @@ class Settings(BaseSettings):
     aws_region: str = "us-east-1"
     s3_bucket: str = "fincopilot-uploads"
 
+    # Email (Resend — resend.com free tier)
+    resend_api_key: str = ""
+    email_from: str = "FinCopilot <onboarding@resend.dev>"
+
     # AI
     anthropic_api_key: str = ""
     openai_api_key: str = ""

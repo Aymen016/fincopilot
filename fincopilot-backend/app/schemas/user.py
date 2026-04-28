@@ -28,3 +28,8 @@ class TokenResponse(BaseModel):
 
 class TokenRefresh(BaseModel):
     refresh_token: str
+
+
+class VerifyEmailRequest(BaseModel):
+    email: EmailStr
+    code: str

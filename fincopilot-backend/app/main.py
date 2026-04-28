@@ -2,6 +2,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
+from sqlalchemy import text
 
 from app.config import get_settings
 from app.database import engine, Base
@@ -14,6 +15,13 @@ settings = get_settings()
 async def lifespan(app: FastAPI):
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+        if not settings.database_url.startswith("sqlite"):
+            await conn.execute(text(
+                "ALTER TABLE users ADD COLUMN IF NOT EXISTS verification_code VARCHAR(6);"
+            ))
+            await conn.execute(text(
+                "ALTER TABLE users ADD COLUMN IF NOT EXISTS code_expires_at TIMESTAMPTZ;"
+            ))
     from app.utils.seed_categories import seed as seed_categories
     await seed_categories()
     yield
