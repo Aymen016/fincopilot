@@ -27,9 +27,15 @@ class Settings(BaseSettings):
     aws_region: str = "us-east-1"
     s3_bucket: str = "fincopilot-uploads"
 
-    # Email (Resend — resend.com free tier)
+    # Email — SMTP (Gmail / any provider) takes priority over Resend
+    smtp_host: str = ""
+    smtp_port: int = 587
+    smtp_user: str = ""
+    smtp_password: str = ""
+
+    # Email — Resend API (resend.com free tier, fallback when SMTP not set)
     resend_api_key: str = ""
-    email_from: str = "FinCopilot <onboarding@resend.dev>"
+    email_from: str = ""
 
     # AI
     anthropic_api_key: str = ""

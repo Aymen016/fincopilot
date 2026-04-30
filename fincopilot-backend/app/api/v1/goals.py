@@ -60,7 +60,7 @@ async def delete_goal(
     await svc.repo.delete(goal_id)
 
 
-@router.patch("/{goal_id}/deposit", response_model=GoalResponse)
+@router.post("/{goal_id}/deposit", response_model=GoalResponse)
 async def deposit(
     goal_id: UUID,
     data: GoalDepositRequest,
