@@ -15,7 +15,16 @@ settings = get_settings()
 async def lifespan(app: FastAPI):
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
-        if not settings.database_url.startswith("sqlite"):
+        if settings.database_url.startswith("sqlite"):
+            for stmt in [
+                "ALTER TABLE users ADD COLUMN verification_code VARCHAR(6)",
+                "ALTER TABLE users ADD COLUMN code_expires_at DATETIME",
+            ]:
+                try:
+                    await conn.execute(text(stmt))
+                except Exception:
+                    pass  # column already exists
+        else:
             await conn.execute(text(
                 "ALTER TABLE users ADD COLUMN IF NOT EXISTS verification_code VARCHAR(6);"
             ))

@@ -49,7 +49,7 @@ async def register(data: UserCreate, db: AsyncSession = Depends(get_db)):
     try:
         await send_verification_email(data.email, code)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to send verification email: {e}")
+        raise HTTPException(status_code=503, detail=f"Failed to send verification email: {e}")
     return {"message": "Verification code sent to your email"}
 
 

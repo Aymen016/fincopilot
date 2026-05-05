@@ -1,9 +1,13 @@
+from pathlib import Path
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from functools import lru_cache
 
+# Resolve .env relative to this file so it works regardless of CWD
+_ENV_FILE = Path(__file__).parent.parent / ".env"
+
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+    model_config = SettingsConfigDict(env_file=str(_ENV_FILE), env_file_encoding="utf-8", extra="ignore")
 
     # App
     environment: str = "development"
@@ -36,6 +40,10 @@ class Settings(BaseSettings):
     # Email — Resend API (resend.com free tier, fallback when SMTP not set)
     resend_api_key: str = ""
     email_from: str = ""
+
+    # Resend sandbox: when set, all emails are delivered here instead of the
+    # real recipient (useful on HF Spaces where no domain is verified yet)
+    resend_test_email: str = ""
 
     # AI
     anthropic_api_key: str = ""
