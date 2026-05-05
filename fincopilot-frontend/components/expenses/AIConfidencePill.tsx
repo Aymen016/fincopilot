@@ -29,8 +29,9 @@ export function AIConfidencePill({ expense, onCorrected }: { expense: Expense; o
           autoFocus
           onChange={(e) => e.target.value && handleCorrect(e.target.value)}
           onBlur={() => setCorrecting(false)}
-          className="text-xs border border-gray-300 rounded px-1 py-0.5 bg-white"
+          className="text-xs input-dark w-auto px-2 py-1"
           defaultValue=""
+          style={{ colorScheme: "dark" }}
         >
           <option value="">Select…</option>
           {categories?.map((c: any) => (
@@ -45,10 +46,10 @@ export function AIConfidencePill({ expense, onCorrected }: { expense: Expense; o
     <button
       onClick={() => setCorrecting(true)}
       title="Click to correct AI category"
-      className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium transition ${
+      className={`inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full font-bold transition-all ${
         isLow
-          ? "bg-amber-100 text-amber-700 hover:bg-amber-200"
-          : "bg-indigo-100 text-indigo-700 hover:bg-indigo-200"
+          ? "bg-amber-500/15 text-amber-400 border border-amber-500/20 hover:bg-amber-500/25"
+          : "bg-violet-500/15 text-violet-400 border border-violet-500/20 hover:bg-violet-500/25"
       }`}
     >
       AI · {confidence}%

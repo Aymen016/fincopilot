@@ -1,12 +1,12 @@
 "use client";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { apiClient } from "@/lib/api";
-import { TrendingUp, ShieldCheck, Sparkles, Target, Mail } from "lucide-react";
+import { TrendingUp, ArrowRight, Mail, CheckCircle2, Eye, EyeOff, Sparkles, Shield, Target, Zap } from "lucide-react";
 
 const schema = z.object({
   full_name: z.string().min(2),
@@ -16,9 +16,10 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 const FEATURES = [
-  { icon: Sparkles, text: "AI-powered spending insights" },
-  { icon: Target, text: "Smart savings goal tracking" },
-  { icon: ShieldCheck, text: "Budget alerts before you overspend" },
+  { icon: Sparkles, label: "AI Insights", desc: "Personalized spending analysis" },
+  { icon: Target, label: "Smart Goals", desc: "Savings tracking that adapts" },
+  { icon: Shield, label: "Budget Alerts", desc: "Never overspend again" },
+  { icon: Zap, label: "Forecasting", desc: "See next month's risks" },
 ];
 
 export default function RegisterPage() {
@@ -26,8 +27,10 @@ export default function RegisterPage() {
   const [error, setError] = useState("");
   const [step, setStep] = useState<"register" | "verify">("register");
   const [pendingEmail, setPendingEmail] = useState("");
-  const [code, setCode] = useState("");
+  const [code, setCode] = useState(["", "", "", "", "", ""]);
   const [verifying, setVerifying] = useState(false);
+  const [showPw, setShowPw] = useState(false);
+  const codeRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -44,12 +47,32 @@ export default function RegisterPage() {
     }
   };
 
+  const handleCodeInput = (idx: number, val: string) => {
+    const digit = val.replace(/\D/g, "").slice(-1);
+    const next = [...code];
+    next[idx] = digit;
+    setCode(next);
+    if (digit && idx < 5) codeRefs.current[idx + 1]?.focus();
+    if (!digit && idx > 0) codeRefs.current[idx - 1]?.focus();
+  };
+
+  const handleCodePaste = (e: React.ClipboardEvent) => {
+    e.preventDefault();
+    const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
+    if (pasted) {
+      const next = pasted.split("").concat(Array(6).fill("")).slice(0, 6);
+      setCode(next);
+      codeRefs.current[Math.min(pasted.length, 5)]?.focus();
+    }
+  };
+
   const onVerify = async () => {
-    if (code.length !== 6) return;
+    const fullCode = code.join("");
+    if (fullCode.length !== 6) return;
     setVerifying(true);
     setError("");
     try {
-      const tokens = await apiClient.verifyEmail(pendingEmail, code) as { access_token: string; refresh_token: string };
+      const tokens = await apiClient.verifyEmail(pendingEmail, fullCode) as { access_token: string; refresh_token: string };
       localStorage.setItem("access_token", tokens.access_token);
       localStorage.setItem("refresh_token", tokens.refresh_token);
       router.push("/dashboard");
@@ -60,77 +83,133 @@ export default function RegisterPage() {
     }
   };
 
-  const left = (
-    <div className="hidden lg:flex lg:w-5/12 bg-gradient-to-br from-brand-700 via-brand-600 to-violet-700 flex-col items-center justify-center p-12 relative overflow-hidden">
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full bg-white blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 w-48 h-48 rounded-full bg-white blur-3xl" />
-      </div>
-      <div className="relative z-10 text-white max-w-xs">
-        <div className="w-14 h-14 bg-white/20 backdrop-blur rounded-2xl flex items-center justify-center mb-8 shadow-lg">
-          <TrendingUp size={28} className="text-white" />
+  const leftPanel = (
+    <div className="hidden lg:flex w-5/12 flex-col justify-between p-12 relative z-10">
+      <div className="flex items-center gap-3">
+        <div className="w-9 h-9 rounded-xl bg-brand-gradient flex items-center justify-center shadow-glow-sm">
+          <TrendingUp size={18} className="text-white" />
         </div>
-        <h2 className="text-3xl font-bold mb-3 leading-tight">Start your financial journey</h2>
-        <p className="text-brand-200 mb-10 leading-relaxed">
-          Join thousands using AI to take control of their spending and savings.
-        </p>
-        <ul className="space-y-4">
-          {FEATURES.map(({ icon: Icon, text }) => (
-            <li key={text} className="flex items-center gap-3 text-brand-100 text-sm">
-              <div className="w-7 h-7 rounded-lg bg-white/15 flex items-center justify-center flex-shrink-0">
-                <Icon size={14} className="text-white" />
-              </div>
-              {text}
-            </li>
-          ))}
-        </ul>
+        <span className="text-white font-bold text-lg tracking-tight">FinCopilot</span>
       </div>
+
+      <div>
+        <div className="mb-10">
+          <h2 className="text-4xl font-bold text-white leading-[1.15] mb-4">
+            Start your{" "}
+            <span className="text-gradient">financial</span>{" "}
+            journey today.
+          </h2>
+          <p className="text-slate-400 text-base leading-relaxed max-w-xs">
+            Join thousands using AI to take control of their spending and build real savings habits.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          {FEATURES.map(({ icon: Icon, label, desc }) => (
+            <div key={label} className="glass p-4 rounded-xl group hover:border-violet-500/20 transition-all duration-200">
+              <div className="w-8 h-8 rounded-lg bg-violet-500/15 flex items-center justify-center mb-3 group-hover:bg-violet-500/25 transition-colors">
+                <Icon size={15} className="text-violet-400" />
+              </div>
+              <p className="text-sm font-semibold text-white mb-0.5">{label}</p>
+              <p className="text-xs text-slate-500">{desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <p className="text-slate-600 text-xs">© 2025 FinCopilot · Free forever</p>
     </div>
   );
 
   if (step === "verify") {
+    const fullCode = code.join("");
     return (
-      <div className="min-h-screen flex">
-        {left}
-        <div className="flex-1 flex items-center justify-center p-8 bg-white">
-          <div className="w-full max-w-sm animate-slide-up text-center">
-            <div className="w-16 h-16 bg-brand-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
-              <Mail size={28} className="text-brand-600" />
-            </div>
-            <h1 className="text-2xl font-bold text-slate-900 mb-2">Check your email</h1>
-            <p className="text-slate-500 text-sm mb-8">
-              We sent a 6-digit code to <span className="font-medium text-slate-700">{pendingEmail}</span>
-            </p>
+      <div className="min-h-screen bg-surface-0 flex overflow-hidden">
+        <div className="fixed inset-0 pointer-events-none overflow-hidden">
+          <div className="glow-orb w-[600px] h-[600px] bg-violet-600/20 -top-48 -left-24 animate-blob" />
+          <div className="glow-orb w-[400px] h-[400px] bg-sky-500/10 -bottom-32 left-1/3 animate-blob" style={{ animationDelay: "4s" }} />
+        </div>
+        {leftPanel}
 
-            <input
-              value={code}
-              onChange={e => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
-              className="w-full border border-slate-300 rounded-xl px-3.5 py-3 text-center text-2xl font-mono tracking-[0.5em] focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition bg-white mb-4"
-              placeholder="000000"
-              maxLength={6}
-              inputMode="numeric"
-            />
-
-            {error && (
-              <div className="bg-rose-50 border border-rose-200 rounded-xl px-3.5 py-2.5 mb-4">
-                <p className="text-rose-600 text-sm">{error}</p>
+        <div className="flex-1 flex items-center justify-center p-8 relative z-10">
+          <div className="w-full max-w-md animate-fade-in-up">
+            <div className="glass p-8 rounded-2xl shadow-glass text-center">
+              <div className="w-16 h-16 rounded-2xl bg-violet-500/15 border border-violet-500/20 flex items-center justify-center mx-auto mb-6">
+                <Mail size={28} className="text-violet-400" />
               </div>
-            )}
 
-            <button
-              onClick={onVerify}
-              disabled={code.length !== 6 || verifying}
-              className="w-full bg-brand-600 hover:bg-brand-700 text-white font-medium py-2.5 rounded-xl transition-colors disabled:opacity-60 shadow-sm"
-            >
-              {verifying ? "Verifying…" : "Verify & continue"}
-            </button>
+              <h1 className="text-2xl font-bold text-white mb-2 tracking-tight">Check your inbox</h1>
+              <p className="text-slate-400 text-sm mb-8 leading-relaxed">
+                We sent a 6-digit verification code to{" "}
+                <span className="text-white font-medium">{pendingEmail}</span>
+              </p>
 
-            <button
-              onClick={() => { setStep("register"); setCode(""); setError(""); }}
-              className="mt-4 text-sm text-slate-500 hover:text-slate-700"
-            >
-              Use a different email
-            </button>
+              {/* OTP input */}
+              <div className="flex gap-2 justify-center mb-6" onPaste={handleCodePaste}>
+                {code.map((digit, idx) => (
+                  <input
+                    key={idx}
+                    ref={el => { codeRefs.current[idx] = el; }}
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={1}
+                    value={digit}
+                    onChange={e => handleCodeInput(idx, e.target.value)}
+                    onKeyDown={e => {
+                      if (e.key === "Backspace" && !digit && idx > 0) {
+                        codeRefs.current[idx - 1]?.focus();
+                      }
+                    }}
+                    className={`w-11 h-13 text-center text-xl font-bold rounded-xl border transition-all duration-200 outline-none bg-white/[0.04] text-white
+                      ${digit
+                        ? "border-violet-500/60 bg-violet-500/10 shadow-glow-sm"
+                        : "border-white/10 focus:border-violet-500/50 focus:bg-white/[0.06]"
+                      }`}
+                    style={{ height: "3.25rem" }}
+                  />
+                ))}
+              </div>
+
+              {error && (
+                <div className="bg-rose-500/10 border border-rose-500/20 rounded-xl px-4 py-3 mb-4">
+                  <p className="text-rose-400 text-sm">{error}</p>
+                </div>
+              )}
+
+              {fullCode.length === 6 && (
+                <div className="flex items-center justify-center gap-1.5 text-emerald-400 text-xs mb-4">
+                  <CheckCircle2 size={13} />
+                  <span>Code entered</span>
+                </div>
+              )}
+
+              <button
+                onClick={onVerify}
+                disabled={fullCode.length !== 6 || verifying}
+                className="btn-brand w-full py-3 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {verifying ? (
+                  <span className="flex items-center gap-2 justify-center">
+                    <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                    </svg>
+                    Verifying…
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-2 justify-center">
+                    Verify & continue <ArrowRight size={15} />
+                  </span>
+                )}
+              </button>
+
+              <button
+                onClick={() => { setStep("register"); setCode(["", "", "", "", "", ""]); setError(""); }}
+                className="mt-4 text-sm text-slate-500 hover:text-slate-300 transition-colors"
+              >
+                ← Use a different email
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -138,75 +217,110 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen flex">
-      {left}
-      <div className="flex-1 flex items-center justify-center p-8 bg-white">
-        <div className="w-full max-w-sm animate-slide-up">
-          <div className="mb-8">
-            <div className="flex items-center gap-2 mb-6 lg:hidden">
-              <div className="w-7 h-7 bg-brand-600 rounded-lg flex items-center justify-center">
-                <TrendingUp size={14} className="text-white" />
-              </div>
-              <span className="font-bold text-slate-900">FinCopilot</span>
+    <div className="min-h-screen bg-surface-0 flex overflow-hidden">
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="glow-orb w-[600px] h-[600px] bg-violet-600/20 -top-48 -left-24 animate-blob" />
+        <div className="glow-orb w-[500px] h-[500px] bg-brand-500/15 top-1/2 -right-48 animate-blob" style={{ animationDelay: "4s" }} />
+        <div className="glow-orb w-[400px] h-[400px] bg-sky-500/10 -bottom-32 left-1/3 animate-blob" style={{ animationDelay: "8s" }} />
+      </div>
+      {leftPanel}
+
+      <div className="flex-1 flex items-center justify-center p-8 relative z-10">
+        <div className="w-full max-w-md animate-fade-in-up">
+          <div className="flex items-center gap-2.5 mb-8 lg:hidden">
+            <div className="w-8 h-8 rounded-xl bg-brand-gradient flex items-center justify-center">
+              <TrendingUp size={15} className="text-white" />
             </div>
-            <h1 className="text-2xl font-bold text-slate-900">Create your account</h1>
-            <p className="text-slate-500 text-sm mt-1">Free forever, no credit card required</p>
+            <span className="text-white font-bold tracking-tight">FinCopilot</span>
           </div>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">Full Name</label>
-              <input
-                {...register("full_name")}
-                className="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition bg-white"
-                placeholder="Jane Smith"
-              />
-              {errors.full_name && <p className="text-rose-500 text-xs mt-1">{errors.full_name.message}</p>}
+          <div className="glass p-8 rounded-2xl shadow-glass">
+            <div className="mb-7">
+              <h1 className="text-2xl font-bold text-white mb-1.5 tracking-tight">Create your account</h1>
+              <p className="text-slate-400 text-sm">Free forever · No credit card required</p>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">Email</label>
-              <input
-                {...register("email")}
-                type="email"
-                className="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition bg-white"
-                placeholder="you@example.com"
-              />
-              {errors.email && <p className="text-rose-500 text-xs mt-1">{errors.email.message}</p>}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">Password</label>
-              <input
-                {...register("password")}
-                type="password"
-                className="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition bg-white"
-                placeholder="Min. 8 characters"
-              />
-              {errors.password && <p className="text-rose-500 text-xs mt-1">{errors.password.message}</p>}
-            </div>
-
-            {error && (
-              <div className="bg-rose-50 border border-rose-200 rounded-xl px-3.5 py-2.5">
-                <p className="text-rose-600 text-sm">{error}</p>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Full Name</label>
+                <input
+                  {...register("full_name")}
+                  className="input-dark"
+                  placeholder="Jane Smith"
+                  autoComplete="name"
+                />
+                {errors.full_name && <p className="text-rose-400 text-xs mt-1.5">{errors.full_name.message}</p>}
               </div>
-            )}
 
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full bg-brand-600 hover:bg-brand-700 text-white font-medium py-2.5 rounded-xl transition-colors disabled:opacity-60 shadow-sm"
-            >
-              {isSubmitting ? "Sending code…" : "Continue"}
-            </button>
-          </form>
+              <div>
+                <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Email</label>
+                <input
+                  {...register("email")}
+                  type="email"
+                  className="input-dark"
+                  placeholder="you@example.com"
+                  autoComplete="email"
+                />
+                {errors.email && <p className="text-rose-400 text-xs mt-1.5">{errors.email.message}</p>}
+              </div>
 
-          <p className="text-center text-sm text-slate-500 mt-6">
-            Already have an account?{" "}
-            <Link href="/login" className="text-brand-600 font-medium hover:text-brand-700">
-              Sign in
-            </Link>
-          </p>
+              <div>
+                <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Password</label>
+                <div className="relative">
+                  <input
+                    {...register("password")}
+                    type={showPw ? "text" : "password"}
+                    className="input-dark pr-10"
+                    placeholder="Min. 8 characters"
+                    autoComplete="new-password"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPw(v => !v)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors"
+                  >
+                    {showPw ? <EyeOff size={15} /> : <Eye size={15} />}
+                  </button>
+                </div>
+                {errors.password && <p className="text-rose-400 text-xs mt-1.5">{errors.password.message}</p>}
+              </div>
+
+              {error && (
+                <div className="bg-rose-500/10 border border-rose-500/20 rounded-xl px-4 py-3">
+                  <p className="text-rose-400 text-sm">{error}</p>
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="btn-brand w-full py-3 text-sm mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isSubmitting ? (
+                  <span className="flex items-center gap-2 justify-center">
+                    <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                    </svg>
+                    Sending code…
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-2 justify-center">
+                    Continue <ArrowRight size={15} />
+                  </span>
+                )}
+              </button>
+            </form>
+
+            <div className="divider my-6" />
+
+            <p className="text-center text-sm text-slate-500">
+              Already have an account?{" "}
+              <Link href="/login" className="text-violet-400 font-semibold hover:text-violet-300 transition-colors">
+                Sign in
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
     </div>

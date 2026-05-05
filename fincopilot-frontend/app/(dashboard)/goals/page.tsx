@@ -35,14 +35,11 @@ export default function GoalsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-slate-900">Savings Goals</h1>
-          <p className="text-sm text-slate-400 mt-0.5">Track your financial milestones</p>
+          <h1 className="text-xl font-bold text-white tracking-tight">Savings Goals</h1>
+          <p className="text-sm text-slate-500 mt-0.5">Track your financial milestones</p>
         </div>
-        <button
-          onClick={() => setShowForm(!showForm)}
-          className="flex items-center gap-2 px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-sm font-medium transition-colors shadow-sm"
-        >
-          <Plus size={16} /> New Goal
+        <button onClick={() => setShowForm(!showForm)} className="btn-brand text-sm px-4 py-2">
+          <Plus size={15} /> New Goal
         </button>
       </div>
 
@@ -50,13 +47,13 @@ export default function GoalsPage() {
       {goals && goals.length > 0 && (
         <div className="grid grid-cols-3 gap-4">
           {[
-            { label: "Total Saved", value: formatCurrency(totalSaved), color: "text-emerald-600" },
-            { label: "Total Target", value: formatCurrency(totalTarget), color: "text-slate-900" },
-            { label: "Avg. Progress", value: `${avgProgress}%`, color: "text-brand-600" },
-          ].map(({ label, value, color }) => (
-            <div key={label} className="bg-white rounded-2xl border border-slate-100 shadow-card p-4">
-              <p className="text-xs text-slate-400 mb-1">{label}</p>
-              <p className={`text-xl font-bold ${color}`}>{value}</p>
+            { label: "Total Saved", value: formatCurrency(totalSaved), accent: "text-emerald-400" },
+            { label: "Total Target", value: formatCurrency(totalTarget), accent: "text-white" },
+            { label: "Avg. Progress", value: `${avgProgress}%`, accent: "text-violet-400" },
+          ].map(({ label, value, accent }) => (
+            <div key={label} className="stat-card">
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">{label}</p>
+              <p className={`text-xl font-bold ${accent} tracking-tight`}>{value}</p>
             </div>
           ))}
         </div>
@@ -64,41 +61,42 @@ export default function GoalsPage() {
 
       {/* New goal form */}
       {showForm && (
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-card p-5 animate-slide-up">
-          <p className="font-semibold text-slate-900 mb-4">Create New Goal</p>
+        <div className="glass rounded-2xl p-5 animate-slide-up border-violet-500/20">
+          <p className="font-semibold text-white mb-4 text-sm">Create New Goal</p>
           <div className="grid grid-cols-2 gap-3 mb-4">
             <input
               value={formData.name}
               onChange={(e) => setFormData((f) => ({ ...f, name: e.target.value }))}
               placeholder="Goal name (e.g. Emergency Fund)"
-              className="border border-slate-300 rounded-xl px-3 py-2.5 text-sm col-span-2 focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white"
+              className="input-dark col-span-2"
             />
             <input
               type="number"
               value={formData.target_amount}
               onChange={(e) => setFormData((f) => ({ ...f, target_amount: e.target.value }))}
               placeholder="Target amount"
-              className="border border-slate-300 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white"
+              className="input-dark"
             />
             <input
               type="date"
               value={formData.target_date}
               onChange={(e) => setFormData((f) => ({ ...f, target_date: e.target.value }))}
-              className="border border-slate-300 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white"
+              className="input-dark"
+              style={{ colorScheme: "dark" }}
             />
             <textarea
               value={formData.description}
               onChange={(e) => setFormData((f) => ({ ...f, description: e.target.value }))}
               placeholder="Description (optional)"
               rows={2}
-              className="border border-slate-300 rounded-xl px-3 py-2.5 text-sm col-span-2 resize-none focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white"
+              className="input-dark col-span-2 resize-none"
             />
           </div>
           <div className="flex gap-2">
-            <button onClick={handleCreate} className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-sm font-medium transition-colors">
+            <button onClick={handleCreate} className="btn-brand text-sm px-4 py-2">
               Create Goal
             </button>
-            <button onClick={() => setShowForm(false)} className="px-4 py-2 border border-slate-200 rounded-xl text-sm text-slate-600 hover:bg-slate-50 transition-colors">
+            <button onClick={() => setShowForm(false)} className="btn-ghost text-sm px-4 py-2">
               Cancel
             </button>
           </div>
@@ -111,12 +109,12 @@ export default function GoalsPage() {
           <GoalCard key={goal.id} goal={goal} onMutate={mutate} />
         ))}
         {(!goals || goals.length === 0) && (
-          <div className="col-span-2 bg-white rounded-2xl border border-slate-100 shadow-card p-14 text-center">
-            <div className="w-12 h-12 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-3">
-              <Target size={20} className="text-slate-400" />
+          <div className="col-span-2 glass rounded-2xl p-16 text-center">
+            <div className="w-12 h-12 rounded-2xl bg-white/[0.04] border border-white/[0.07] flex items-center justify-center mx-auto mb-4">
+              <Target size={20} className="text-slate-600" />
             </div>
-            <p className="font-medium text-slate-700">No goals yet</p>
-            <p className="text-slate-400 text-sm mt-1">Create a savings goal to start tracking your progress</p>
+            <p className="font-semibold text-slate-300 text-sm">No goals yet</p>
+            <p className="text-slate-600 text-xs mt-1.5">Create a savings goal to start tracking your progress</p>
           </div>
         )}
       </div>

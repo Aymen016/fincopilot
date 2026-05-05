@@ -3,25 +3,25 @@ import { X, TrendingUp, PiggyBank, CreditCard, RefreshCw, Repeat, BarChart2 } fr
 
 const SEVERITY_CONFIG = {
   high: {
-    border: "border-rose-200",
-    bg: "bg-rose-50",
-    badge: "bg-rose-100 text-rose-700",
-    icon: "text-rose-500",
-    bar: "bg-rose-400",
+    bar: "bg-rose-500",
+    iconBg: "bg-rose-500/15",
+    iconText: "text-rose-400",
+    badge: "badge-rose",
+    border: "border-rose-500/15",
   },
   medium: {
-    border: "border-amber-200",
-    bg: "bg-amber-50",
-    badge: "bg-amber-100 text-amber-700",
-    icon: "text-amber-500",
     bar: "bg-amber-400",
+    iconBg: "bg-amber-500/15",
+    iconText: "text-amber-400",
+    badge: "badge-amber",
+    border: "border-amber-500/15",
   },
   low: {
-    border: "border-blue-200",
-    bg: "bg-blue-50",
-    badge: "bg-blue-100 text-blue-700",
-    icon: "text-blue-500",
-    bar: "bg-blue-400",
+    bar: "bg-sky-400",
+    iconBg: "bg-sky-500/15",
+    iconText: "text-sky-400",
+    badge: "badge-sky",
+    border: "border-sky-500/15",
   },
 };
 
@@ -47,31 +47,29 @@ export function InsightCard({ insight, onDismiss }: { insight: Insight; onDismis
   const Icon = TYPE_ICONS[insight.type] ?? TrendingUp;
 
   return (
-    <div className={`relative bg-white border rounded-2xl p-4 shadow-card hover:shadow-card-md transition-shadow group ${cfg.border}`}>
+    <div className={`relative glass glass-hover rounded-2xl p-4 group border ${cfg.border}`}>
       {/* Left accent bar */}
-      <div className={`absolute left-0 top-3 bottom-3 w-1 rounded-full ${cfg.bar}`} />
+      <div className={`absolute left-0 top-3 bottom-3 w-0.5 rounded-full ${cfg.bar}`} />
 
       <div className="flex items-start gap-3 pl-3">
-        <div className={`w-8 h-8 rounded-xl ${cfg.bg} flex items-center justify-center flex-shrink-0 mt-0.5`}>
-          <Icon size={15} className={cfg.icon} />
+        <div className={`w-8 h-8 rounded-xl ${cfg.iconBg} flex items-center justify-center flex-shrink-0 mt-0.5`}>
+          <Icon size={14} className={cfg.iconText} />
         </div>
 
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
-            <p className="font-semibold text-sm text-slate-900">{insight.title}</p>
-            <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${cfg.badge}`}>
-              {insight.severity}
-            </span>
+          <div className="flex items-center gap-2 mb-1.5">
+            <p className="font-semibold text-sm text-slate-100">{insight.title}</p>
+            <span className={`badge ${cfg.badge}`}>{insight.severity}</span>
           </div>
-          <p className="text-sm text-slate-600 leading-relaxed">{insight.body}</p>
+          <p className="text-sm text-slate-400 leading-relaxed">{insight.body}</p>
         </div>
 
         {onDismiss && (
           <button
             onClick={onDismiss}
-            className="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-slate-600 transition-all shrink-0 p-0.5 rounded-lg hover:bg-slate-100"
+            className="opacity-0 group-hover:opacity-100 text-slate-600 hover:text-slate-300 transition-all shrink-0 p-1 rounded-lg hover:bg-white/[0.06]"
           >
-            <X size={14} />
+            <X size={13} />
           </button>
         )}
       </div>

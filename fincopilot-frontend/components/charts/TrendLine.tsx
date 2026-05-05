@@ -1,5 +1,5 @@
 "use client";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import useSWR from "swr";
 import { apiClient } from "@/lib/api";
 
@@ -7,18 +7,31 @@ interface Props {
   showForecast?: boolean;
 }
 
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (!active || !payload?.length) return null;
+  return (
+    <div className="chart-tooltip">
+      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">{label}</p>
+      {payload.map((p: any) => (
+        <p key={p.dataKey} className="text-xs font-semibold" style={{ color: p.color }}>
+          {new Intl.NumberFormat("en-PK", { style: "currency", currency: "PKR", maximumFractionDigits: 0 }).format(p.value)}
+        </p>
+      ))}
+    </div>
+  );
+};
+
 export function TrendLine({ showForecast }: Props) {
   const { data: expenses } = useSWR("expenses-trend", () => apiClient.getExpenses({ limit: 200 }));
 
   if (!expenses?.items?.length) {
     return (
-      <div className="h-40 flex items-center justify-center text-gray-400 text-sm">
+      <div className="h-40 flex items-center justify-center text-slate-600 text-sm">
         Add expenses to see your trend
       </div>
     );
   }
 
-  // Group by month
   const monthly: Record<string, number> = {};
   expenses.items.forEach((e: any) => {
     const key = e.expense_date.slice(0, 7);
@@ -35,15 +48,39 @@ export function TrendLine({ showForecast }: Props) {
     }));
 
   return (
-    <ResponsiveContainer width="100%" height={160}>
-      <LineChart data={data} margin={{ top: 5, right: 10, left: -20, bottom: 5 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
-        <XAxis dataKey="month" tick={{ fontSize: 11 }} />
-        <YAxis tick={{ fontSize: 11 }} />
-        <Tooltip formatter={(val: number) => new Intl.NumberFormat("en-PK", { style: "currency", currency: "PKR", maximumFractionDigits: 0 }).format(val)} />
-        <Line type="monotone" dataKey="actual" stroke="#6366f1" strokeWidth={2} dot={{ r: 3 }} />
+    <ResponsiveContainer width="100%" height={150}>
+      <LineChart data={data} margin={{ top: 5, right: 10, left: -24, bottom: 5 }}>
+        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+        <XAxis
+          dataKey="month"
+          tick={{ fontSize: 10, fill: "#475569" }}
+          axisLine={false}
+          tickLine={false}
+        />
+        <YAxis
+          tick={{ fontSize: 10, fill: "#475569" }}
+          axisLine={false}
+          tickLine={false}
+          tickFormatter={(v) => `${Math.round(v / 1000)}k`}
+        />
+        <Tooltip content={<CustomTooltip />} cursor={{ stroke: "rgba(255,255,255,0.08)", strokeWidth: 1 }} />
+        <Line
+          type="monotone"
+          dataKey="actual"
+          stroke="#a78bfa"
+          strokeWidth={2}
+          dot={{ r: 3, fill: "#a78bfa", strokeWidth: 0 }}
+          activeDot={{ r: 4, fill: "#a78bfa", strokeWidth: 0 }}
+        />
         {showForecast && (
-          <Line type="monotone" dataKey="forecast" stroke="#f59e0b" strokeWidth={2} strokeDasharray="5 5" dot={false} />
+          <Line
+            type="monotone"
+            dataKey="forecast"
+            stroke="#fbbf24"
+            strokeWidth={2}
+            strokeDasharray="5 5"
+            dot={false}
+          />
         )}
       </LineChart>
     </ResponsiveContainer>

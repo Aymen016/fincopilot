@@ -3,7 +3,7 @@ import useSWR from "swr";
 import { apiClient } from "@/lib/api";
 import { TrendLine } from "@/components/charts/TrendLine";
 import { formatCurrency } from "@/lib/utils";
-import { AlertTriangle, TrendingUp, TrendingDown } from "lucide-react";
+import { AlertTriangle, TrendingUp, TrendingDown, BarChart2 } from "lucide-react";
 
 export default function ForecastPage() {
   const { data: forecast } = useSWR("forecast-monthly", () => apiClient.getMonthlyForecast());
@@ -16,26 +16,28 @@ export default function ForecastPage() {
   return (
     <div className="p-6 space-y-6 animate-fade-in">
       <div>
-        <h1 className="text-xl font-bold text-slate-900">Spending Forecast</h1>
-        <p className="text-sm text-slate-400 mt-0.5">AI-predicted spending for {nextMonthName}</p>
+        <h1 className="text-xl font-bold text-white tracking-tight">Spending Forecast</h1>
+        <p className="text-sm text-slate-500 mt-0.5">AI-predicted spending for {nextMonthName}</p>
       </div>
 
       {/* Risk flags */}
       {risk?.risk_flags?.length > 0 && (
-        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <AlertTriangle size={16} className="text-amber-600" />
-            <p className="font-semibold text-amber-900 text-sm">Risk Alerts ({risk.risk_flags.length})</p>
+        <div className="glass rounded-2xl p-4 border-amber-500/20 bg-amber-500/[0.04]">
+          <div className="flex items-center gap-2.5 mb-3">
+            <div className="w-7 h-7 rounded-lg bg-amber-500/15 flex items-center justify-center">
+              <AlertTriangle size={13} className="text-amber-400" />
+            </div>
+            <p className="font-semibold text-amber-300 text-sm">Risk Alerts ({risk.risk_flags.length})</p>
           </div>
           <div className="space-y-2">
             {risk.risk_flags.map((flag: any) => (
-              <div key={flag.category_id} className="flex items-center justify-between bg-white rounded-xl px-3 py-2.5 border border-amber-100">
-                <span className="font-medium text-slate-900 text-sm">{flag.category_name}</span>
-                <div className="flex items-center gap-3 text-sm">
-                  <span className="text-slate-500">Predicted: <strong>{formatCurrency(flag.predicted)}</strong></span>
+              <div key={flag.category_id} className="flex items-center justify-between bg-white/[0.03] rounded-xl px-3.5 py-2.5 border border-amber-500/10">
+                <span className="font-medium text-slate-200 text-sm">{flag.category_name}</span>
+                <div className="flex items-center gap-4 text-xs">
+                  <span className="text-slate-500">Predicted: <strong className="text-slate-300">{formatCurrency(flag.predicted)}</strong></span>
                   <span className="text-slate-500">Budget: {formatCurrency(flag.budget)}</span>
-                  <span className={`font-semibold ${flag.risk_level === "high" ? "text-rose-600" : "text-amber-600"}`}>
-                    {flag.risk_level === "high" ? "High risk" : "Medium risk"}
+                  <span className={`font-bold badge ${flag.risk_level === "high" ? "badge-rose" : "badge-amber"}`}>
+                    {flag.risk_level === "high" ? "High" : "Medium"}
                   </span>
                 </div>
               </div>
@@ -45,24 +47,27 @@ export default function ForecastPage() {
       )}
 
       {/* Forecast summary */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-card p-5">
+      <div className="glass rounded-2xl p-5">
         <div className="flex items-center justify-between mb-5">
-          <p className="font-semibold text-slate-900">Projected Total</p>
-          {forecast && (
-            <div className="flex items-center gap-2">
-              <p className="text-3xl font-bold text-slate-900">{formatCurrency(forecast.total_predicted)}</p>
-            </div>
-          )}
+          <div>
+            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Projected Total</p>
+            {forecast && (
+              <p className="text-3xl font-bold text-white tracking-tight">{formatCurrency(forecast.total_predicted)}</p>
+            )}
+          </div>
+          <div className="w-10 h-10 rounded-xl bg-violet-500/15 flex items-center justify-center">
+            <BarChart2 size={18} className="text-violet-400" />
+          </div>
         </div>
-        <p className="text-sm font-medium text-slate-500 mb-3">Historical Trend</p>
+        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Historical Trend</p>
         <TrendLine showForecast />
       </div>
 
       {/* By category */}
       {forecast?.by_category && forecast.by_category.length > 0 && (
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-card p-5">
-          <p className="font-semibold text-slate-900 mb-4">Breakdown by Category</p>
-          <div className="space-y-3">
+        <div className="glass rounded-2xl p-5">
+          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-5">Breakdown by Category</p>
+          <div className="space-y-4">
             {forecast.by_category.map((cat: any) => {
               const isOver = cat.budget_amount && cat.predicted_amount > cat.budget_amount;
               const pct = cat.budget_amount
@@ -70,22 +75,22 @@ export default function ForecastPage() {
                 : null;
               return (
                 <div key={cat.category_id}>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-sm font-medium text-slate-700">{cat.category_name}</span>
-                    <div className="flex items-center gap-3 text-sm">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-slate-200">{cat.category_name}</span>
+                    <div className="flex items-center gap-3 text-xs">
                       {cat.budget_amount && (
-                        <span className="text-slate-400 text-xs">Budget: {formatCurrency(cat.budget_amount)}</span>
+                        <span className="text-slate-600">Budget: {formatCurrency(cat.budget_amount)}</span>
                       )}
-                      <span className={`font-semibold flex items-center gap-1 ${isOver ? "text-rose-600" : "text-slate-900"}`}>
-                        {isOver ? <TrendingUp size={13} /> : <TrendingDown size={13} className="text-emerald-500" />}
+                      <span className={`font-bold flex items-center gap-1 ${isOver ? "text-rose-400" : "text-emerald-400"}`}>
+                        {isOver ? <TrendingUp size={11} /> : <TrendingDown size={11} />}
                         {formatCurrency(cat.predicted_amount)}
                       </span>
                     </div>
                   </div>
                   {pct != null && (
-                    <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                    <div className="w-full bg-white/[0.05] rounded-full h-1.5 overflow-hidden">
                       <div
-                        className={`h-1.5 rounded-full ${isOver ? "bg-rose-500" : "bg-brand-500"}`}
+                        className={`h-1.5 rounded-full transition-all duration-500 ${isOver ? "bg-rose-500" : "bg-violet-500"}`}
                         style={{ width: `${pct}%` }}
                       />
                     </div>

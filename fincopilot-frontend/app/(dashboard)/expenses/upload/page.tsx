@@ -2,11 +2,13 @@
 import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { apiClient } from "@/lib/api";
-import { CheckCircle, XCircle, Loader2, Upload } from "lucide-react";
+import { CheckCircle, XCircle, Loader2, Upload, ArrowLeft } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 type JobStatus = { status: string; progress: number; created: number; failed: number; errors: string[] };
 
 export default function UploadPage() {
+  const router = useRouter();
   const [jobId, setJobId] = useState<string | null>(null);
   const [job, setJob] = useState<JobStatus | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -48,60 +50,81 @@ export default function UploadPage() {
   });
 
   return (
-    <div className="p-6 max-w-xl">
-      <h1 className="text-2xl font-bold text-gray-900 mb-2">Import Transactions</h1>
-      <p className="text-gray-500 text-sm mb-6">Upload a CSV file from your bank. We support most formats.</p>
+    <div className="p-6 max-w-xl animate-fade-in">
+      <button
+        onClick={() => router.back()}
+        className="flex items-center gap-2 text-sm text-slate-500 hover:text-slate-300 mb-6 transition-colors"
+      >
+        <ArrowLeft size={15} /> Back
+      </button>
+
+      <div className="mb-6">
+        <h1 className="text-xl font-bold text-white tracking-tight">Import Transactions</h1>
+        <p className="text-sm text-slate-500 mt-0.5">Upload a CSV file from your bank. We support most formats.</p>
+      </div>
 
       <div
         {...getRootProps()}
-        className={`border-2 border-dashed rounded-xl p-12 text-center cursor-pointer transition ${
-          isDragActive ? "border-brand-500 bg-brand-50" : "border-gray-300 hover:border-brand-400 hover:bg-gray-50"
-        } ${(uploading || jobId) ? "opacity-50 cursor-not-allowed" : ""}`}
+        className={`border-2 border-dashed rounded-2xl p-12 text-center cursor-pointer transition-all duration-200 ${
+          isDragActive
+            ? "border-violet-500/60 bg-violet-500/10"
+            : "border-white/10 hover:border-violet-500/40 hover:bg-white/[0.03]"
+        } ${(uploading || jobId) ? "opacity-50 cursor-not-allowed pointer-events-none" : ""}`}
       >
         <input {...getInputProps()} />
-        <Upload className="mx-auto mb-3 text-gray-400" size={40} />
-        <p className="text-gray-600 font-medium">
-          {isDragActive ? "Drop your CSV here" : "Drag & drop your CSV file, or click to browse"}
+        <div className="w-12 h-12 rounded-2xl bg-white/[0.05] border border-white/[0.08] flex items-center justify-center mx-auto mb-4">
+          <Upload size={20} className={isDragActive ? "text-violet-400" : "text-slate-500"} />
+        </div>
+        <p className="text-slate-200 font-medium text-sm">
+          {isDragActive ? "Drop your CSV here" : "Drag & drop your CSV, or click to browse"}
         </p>
-        <p className="text-gray-400 text-sm mt-1">Supports: date, amount, description, merchant columns</p>
+        <p className="text-slate-600 text-xs mt-1.5">Supports: date, amount, description, merchant columns</p>
       </div>
 
       {error && (
-        <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">{error}</div>
+        <div className="mt-4 bg-rose-500/10 border border-rose-500/20 rounded-xl px-4 py-3">
+          <p className="text-rose-400 text-sm">{error}</p>
+        </div>
       )}
 
       {job && (
-        <div className="mt-6 bg-white rounded-xl border border-gray-200 p-5">
+        <div className="mt-6 glass rounded-2xl p-5">
           <div className="flex items-center gap-3 mb-4">
             {job.status === "done" ? (
-              <CheckCircle className="text-green-500" size={22} />
+              <div className="w-9 h-9 rounded-xl bg-emerald-500/15 flex items-center justify-center">
+                <CheckCircle size={18} className="text-emerald-400" />
+              </div>
             ) : job.status === "error" ? (
-              <XCircle className="text-red-500" size={22} />
+              <div className="w-9 h-9 rounded-xl bg-rose-500/15 flex items-center justify-center">
+                <XCircle size={18} className="text-rose-400" />
+              </div>
             ) : (
-              <Loader2 className="text-brand-600 animate-spin" size={22} />
+              <div className="w-9 h-9 rounded-xl bg-violet-500/15 flex items-center justify-center">
+                <Loader2 size={18} className="text-violet-400 animate-spin" />
+              </div>
             )}
             <div>
-              <p className="font-medium text-gray-900 capitalize">{job.status}</p>
-              <p className="text-sm text-gray-500">{job.progress}% complete</p>
+              <p className="font-semibold text-slate-100 text-sm capitalize">{job.status}</p>
+              <p className="text-xs text-slate-500">{job.progress}% complete</p>
             </div>
           </div>
 
-          <div className="w-full bg-gray-100 rounded-full h-2 mb-4">
+          <div className="w-full bg-white/[0.06] rounded-full h-1.5 mb-4 overflow-hidden">
             <div
-              className="bg-brand-600 h-2 rounded-full transition-all"
+              className="bg-violet-500 h-1.5 rounded-full transition-all duration-300"
               style={{ width: `${job.progress}%` }}
             />
           </div>
 
-          <div className="flex gap-6 text-sm">
-            <div><span className="text-gray-500">Created:</span> <strong className="text-green-600">{job.created}</strong></div>
-            <div><span className="text-gray-500">Failed:</span> <strong className="text-red-600">{job.failed}</strong></div>
+          <div className="flex gap-6 text-xs">
+            <div className="text-slate-500">Created: <strong className="text-emerald-400">{job.created}</strong></div>
+            <div className="text-slate-500">Failed: <strong className="text-rose-400">{job.failed}</strong></div>
           </div>
 
           {job.errors.length > 0 && (
             <div className="mt-3 space-y-1">
               {job.errors.map((e, i) => (
-                <p key={i} className="text-xs text-red-600">{e}</p>
+                <p key={i} className="text-xs text-rose-400">{e}</p>
               ))}
             </div>
           )}

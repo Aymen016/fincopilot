@@ -25,8 +25,12 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   });
 
   if (res.status === 401) {
+    const hadToken = !!getToken();
     handleUnauthorized();
-    throw new Error("Session expired. Please log in again.");
+    if (hadToken) throw new Error("Session expired. Please log in again.");
+    // No token → real auth error; surface the actual detail from the server
+    const err = await res.json().catch(() => ({ detail: "Incorrect email or password" }));
+    throw new Error(err.detail || "Unauthorized");
   }
 
   if (!res.ok) {
