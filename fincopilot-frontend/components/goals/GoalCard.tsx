@@ -83,33 +83,33 @@ export function GoalCard({ goal, onMutate }: { goal: Goal; onMutate: () => void 
             }
           </div>
           <div>
-            <p className="font-bold text-slate-100 text-sm">{goal.name}</p>
+            <p className="font-bold text-slate-900 dark:text-slate-100 text-sm">{goal.name}</p>
             {goal.description && <p className="text-xs text-slate-500 mt-0.5">{goal.description}</p>}
           </div>
         </div>
         <div className="flex items-center gap-1">
           {!editing ? (
             <>
-              <span className={`text-lg font-black mr-1 ${isComplete ? "text-emerald-400" : "text-violet-400"}`}>{pct}%</span>
+              <span className={`text-lg font-black mr-1 ${isComplete ? "text-emerald-600 dark:text-emerald-400" : "text-violet-600 dark:text-violet-400"}`}>{pct}%</span>
               <button
                 onClick={() => setEditing(true)}
-                className="p-1.5 rounded-lg text-slate-600 hover:text-violet-400 hover:bg-violet-500/10 transition-colors"
+                className="p-1.5 rounded-lg text-slate-500 dark:text-slate-600 hover:text-violet-600 dark:hover:text-violet-400 hover:bg-violet-500/10 transition-colors"
               >
                 <Pencil size={13} />
               </button>
               <button
                 onClick={handleDelete}
-                className="p-1.5 rounded-lg text-slate-600 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
+                className="p-1.5 rounded-lg text-slate-500 dark:text-slate-600 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
               >
                 <Trash2 size={13} />
               </button>
             </>
           ) : (
             <>
-              <button onClick={handleSaveEdit} className="p-1.5 rounded-lg text-emerald-400 hover:bg-emerald-500/10 transition-colors">
+              <button onClick={handleSaveEdit} className="p-1.5 rounded-lg text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10 transition-colors">
                 <Check size={13} />
               </button>
-              <button onClick={() => setEditing(false)} className="p-1.5 rounded-lg text-slate-500 hover:bg-white/[0.05] transition-colors">
+              <button onClick={() => setEditing(false)} className="p-1.5 rounded-lg text-slate-500 hover:bg-slate-900/[0.05] dark:hover:bg-white/[0.05] transition-colors">
                 <X size={13} />
               </button>
             </>
@@ -139,7 +139,6 @@ export function GoalCard({ goal, onMutate }: { goal: Goal; onMutate: () => void 
               value={editData.target_date}
               onChange={(e) => setEditData((d) => ({ ...d, target_date: e.target.value }))}
               className="input-dark"
-              style={{ colorScheme: "dark" }}
             />
           </div>
           <input
@@ -152,20 +151,20 @@ export function GoalCard({ goal, onMutate }: { goal: Goal; onMutate: () => void 
       )}
 
       {/* Progress bar */}
-      <div className="w-full bg-white/[0.06] rounded-full h-2 mb-3 overflow-hidden">
+      <div className="w-full bg-slate-900/[0.07] dark:bg-white/[0.06] rounded-full h-2 mb-3 overflow-hidden">
         <div className={`h-2 rounded-full transition-all duration-700 ${barColor}`} style={{ width: `${pct}%` }} />
       </div>
 
       {/* Numbers */}
       <div className="flex justify-between text-xs mb-3">
-        <span className="font-semibold text-slate-200">
+        <span className="font-semibold text-slate-800 dark:text-slate-200">
           {formatCurrency(goal.current_amount)} <span className="font-normal text-slate-500">saved</span>
         </span>
         <span className="text-slate-500">of {formatCurrency(goal.target_amount)}</span>
       </div>
 
       {/* Meta */}
-      <div className="flex items-center gap-1.5 text-xs text-slate-600 mb-4">
+      <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-600 mb-4">
         <Calendar size={11} />
         <span>{isComplete ? "🎉 Goal reached!" : `${formatCurrency(remaining)} to go · ${daysLeft} days left`}</span>
       </div>
@@ -191,12 +190,12 @@ export function GoalCard({ goal, onMutate }: { goal: Goal; onMutate: () => void 
                 Cancel
               </button>
             </div>
-            {depositError && <p className="text-rose-400 text-xs">{depositError}</p>}
+            {depositError && <p className="text-rose-600 dark:text-rose-400 text-xs">{depositError}</p>}
           </div>
         ) : (
           <button
             onClick={() => setDepositing(true)}
-            className="flex items-center gap-1.5 text-xs font-semibold text-violet-400 hover:text-violet-300 transition-colors"
+            className="flex items-center gap-1.5 text-xs font-semibold text-violet-600 hover:text-violet-700 dark:text-violet-400 dark:hover:text-violet-300 transition-colors"
           >
             <Plus size={13} /> Add deposit
           </button>

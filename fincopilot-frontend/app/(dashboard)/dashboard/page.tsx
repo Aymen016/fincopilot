@@ -285,11 +285,11 @@ export default function DashboardPage() {
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center py-12 gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-white/[0.04] border border-white/[0.07] flex items-center justify-center">
-                <Receipt size={20} className="text-slate-600" />
+              <div className="w-12 h-12 rounded-2xl bg-slate-900/[0.04] dark:bg-white/[0.04] border border-slate-900/[0.07] dark:border-white/[0.07] flex items-center justify-center">
+                <Receipt size={20} className="text-slate-400 dark:text-slate-600" />
               </div>
               <p className="text-slate-500 text-sm">No expenses yet</p>
-              <Link href="/expenses/new" className="text-violet-400 text-xs font-bold hover:text-violet-300 transition-colors">
+              <Link href="/expenses/new" className="text-violet-600 dark:text-violet-400 text-xs font-bold hover:text-violet-700 dark:hover:text-violet-300 transition-colors">
                 + Add your first expense
               </Link>
             </div>

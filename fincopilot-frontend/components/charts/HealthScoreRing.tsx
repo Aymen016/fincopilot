@@ -1,4 +1,5 @@
 "use client";
+import { useTheme } from "next-themes";
 
 interface Props {
   score: number;
@@ -7,6 +8,8 @@ interface Props {
 }
 
 export function HealthScoreRing({ score, grade, trend }: Props) {
+  const { resolvedTheme } = useTheme();
+  const trackColor = resolvedTheme === "light" ? "rgba(15,23,42,0.07)" : "rgba(255,255,255,0.06)";
   const radius = 52;
   const circumference = 2 * Math.PI * radius;
   const clampedScore = Math.max(0, Math.min(100, score));
@@ -33,7 +36,7 @@ export function HealthScoreRing({ score, grade, trend }: Props) {
           <circle
             cx="60" cy="60" r={radius}
             fill="none"
-            stroke="rgba(255,255,255,0.06)"
+            stroke={trackColor}
             strokeWidth="8"
           />
           <circle
@@ -48,7 +51,7 @@ export function HealthScoreRing({ score, grade, trend }: Props) {
           />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
-          <span className="text-3xl font-bold text-white">{clampedScore}</span>
+          <span className="text-3xl font-bold text-slate-900 dark:text-white">{clampedScore}</span>
           <span className="text-sm font-bold" style={{ color }}>{grade}</span>
         </div>
       </div>

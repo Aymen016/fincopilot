@@ -6,6 +6,7 @@
 
 @layer base {
   :root {
+    color-scheme: light;
     --bg-primary: #f8fafc;
     --bg-gradient-1: rgba(124, 58, 237, 0.06);
     --bg-gradient-2: rgba(14, 165, 233, 0.04);
@@ -67,6 +68,7 @@
   }
 
   .dark {
+    color-scheme: dark;
     --bg-primary: #060610;
     --bg-gradient-1: rgba(124, 58, 237, 0.18);
     --bg-gradient-2: rgba(14, 165, 233, 0.08);

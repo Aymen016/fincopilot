@@ -28,8 +28,8 @@ export function SpendingDonut({ expenses }: { expenses: Expense[] }) {
     if (!active || !payload?.length) return null;
     return (
       <div className="chart-tooltip">
-        <p className="text-xs font-semibold text-white mb-0.5">{payload[0].name}</p>
-        <p className="text-xs text-slate-400">{formatCurrency(payload[0].value)}</p>
+        <p className="text-xs font-semibold text-slate-900 dark:text-white mb-0.5">{payload[0].name}</p>
+        <p className="text-xs text-slate-500 dark:text-slate-400">{formatCurrency(payload[0].value)}</p>
       </div>
     );
   };
@@ -65,7 +65,7 @@ export function SpendingDonut({ expenses }: { expenses: Expense[] }) {
               style={{ backgroundColor: COLORS[i % COLORS.length] }}
             />
             <span className="text-[11px] text-slate-500 truncate">{d.name}</span>
-            <span className="text-[11px] font-semibold text-slate-300 ml-auto shrink-0">
+            <span className="text-[11px] font-semibold text-slate-700 dark:text-slate-300 ml-auto shrink-0">
               {Math.round((d.value / total) * 100)}%
             </span>
           </div>

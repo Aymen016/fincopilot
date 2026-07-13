@@ -2,6 +2,7 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import useSWR from "swr";
 import { apiClient } from "@/lib/api";
+import { useTheme } from "next-themes";
 
 interface Props {
   showForecast?: boolean;
@@ -11,7 +12,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload?.length) return null;
   return (
     <div className="chart-tooltip">
-      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">{label}</p>
+      <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">{label}</p>
       {payload.map((p: any) => (
         <p key={p.dataKey} className="text-xs font-semibold" style={{ color: p.color }}>
           {new Intl.NumberFormat("en-PK", { style: "currency", currency: "PKR", maximumFractionDigits: 0 }).format(p.value)}
@@ -23,10 +24,15 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
 export function TrendLine({ showForecast }: Props) {
   const { data: expenses } = useSWR("expenses-trend", () => apiClient.getExpenses({ limit: 200 }));
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme !== "light";
+  const tickColor = isDark ? "#475569" : "#64748b";
+  const gridColor = isDark ? "rgba(255,255,255,0.05)" : "rgba(15,23,42,0.06)";
+  const cursorColor = isDark ? "rgba(255,255,255,0.08)" : "rgba(15,23,42,0.08)";
 
   if (!expenses?.items?.length) {
     return (
-      <div className="h-40 flex items-center justify-center text-slate-600 text-sm">
+      <div className="h-40 flex items-center justify-center text-slate-400 dark:text-slate-600 text-sm">
         Add expenses to see your trend
       </div>
     );
@@ -50,20 +56,20 @@ export function TrendLine({ showForecast }: Props) {
   return (
     <ResponsiveContainer width="100%" height={150}>
       <LineChart data={data} margin={{ top: 5, right: 10, left: -24, bottom: 5 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+        <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
         <XAxis
           dataKey="month"
-          tick={{ fontSize: 10, fill: "#475569" }}
+          tick={{ fontSize: 10, fill: tickColor }}
           axisLine={false}
           tickLine={false}
         />
         <YAxis
-          tick={{ fontSize: 10, fill: "#475569" }}
+          tick={{ fontSize: 10, fill: tickColor }}
           axisLine={false}
           tickLine={false}
           tickFormatter={(v) => `${Math.round(v / 1000)}k`}
         />
-        <Tooltip content={<CustomTooltip />} cursor={{ stroke: "rgba(255,255,255,0.08)", strokeWidth: 1 }} />
+        <Tooltip content={<CustomTooltip />} cursor={{ stroke: cursorColor, strokeWidth: 1 }} />
         <Line
           type="monotone"
           dataKey="actual"

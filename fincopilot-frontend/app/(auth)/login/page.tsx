@@ -106,7 +106,7 @@ export default function LoginPage() {
   if (step === "verify") {
     const fullCode = code.join("");
     return (
-      <div className="min-h-screen bg-surface-0 flex items-center justify-center p-8 overflow-hidden">
+      <div className="min-h-screen bg-slate-50 dark:bg-surface-0 flex items-center justify-center p-8 overflow-hidden">
         {/* Background orbs */}
         <div className="fixed inset-0 pointer-events-none overflow-hidden">
           <div className="glow-orb w-[600px] h-[600px] bg-violet-600/20 -top-48 -left-24 animate-blob" />
@@ -116,13 +116,13 @@ export default function LoginPage() {
         <div className="w-full max-w-md relative z-10 animate-fade-in-up">
           <div className="glass p-8 rounded-2xl shadow-glass text-center">
             <div className="w-16 h-16 rounded-2xl bg-violet-500/15 border border-violet-500/20 flex items-center justify-center mx-auto mb-6">
-              <Mail size={28} className="text-violet-400" />
+              <Mail size={28} className="text-violet-600 dark:text-violet-400" />
             </div>
 
-            <h1 className="text-2xl font-bold text-white mb-2 tracking-tight">Verify it&apos;s you</h1>
-            <p className="text-slate-400 text-sm mb-8 leading-relaxed">
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight">Verify it&apos;s you</h1>
+            <p className="text-slate-500 dark:text-slate-400 text-sm mb-8 leading-relaxed">
               We sent a 6-digit verification code to{" "}
-              <span className="text-white font-medium">{pendingEmail}</span>
+              <span className="text-slate-900 dark:text-white font-medium">{pendingEmail}</span>
             </p>
 
             {/* OTP input */}
@@ -141,10 +141,10 @@ export default function LoginPage() {
                       codeRefs.current[idx - 1]?.focus();
                     }
                   }}
-                  className={`w-11 h-13 text-center text-xl font-bold rounded-xl border transition-all duration-200 outline-none bg-white/[0.04] text-white
+                  className={`w-11 h-13 text-center text-xl font-bold rounded-xl border transition-all duration-200 outline-none bg-slate-900/[0.04] dark:bg-white/[0.04] text-slate-900 dark:text-white
                     ${digit
                       ? "border-violet-500/60 bg-violet-500/10 shadow-glow-sm"
-                      : "border-white/10 focus:border-violet-500/50 focus:bg-white/[0.06]"
+                      : "border-slate-900/10 dark:border-white/10 focus:border-violet-500/50 focus:bg-slate-900/[0.06] dark:focus:bg-white/[0.06]"
                     }`}
                   style={{ height: "3.25rem" }}
                 />
@@ -153,18 +153,18 @@ export default function LoginPage() {
 
             {error && (
               <div className="bg-rose-500/10 border border-rose-500/20 rounded-xl px-4 py-3 mb-4">
-                <p className="text-rose-400 text-sm">{error}</p>
+                <p className="text-rose-600 dark:text-rose-400 text-sm">{error}</p>
               </div>
             )}
 
             {resendMsg && !error && (
               <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl px-4 py-3 mb-4">
-                <p className="text-emerald-400 text-sm">{resendMsg}</p>
+                <p className="text-emerald-600 dark:text-emerald-400 text-sm">{resendMsg}</p>
               </div>
             )}
 
             {fullCode.length === 6 && (
-              <div className="flex items-center justify-center gap-1.5 text-emerald-400 text-xs mb-4">
+              <div className="flex items-center justify-center gap-1.5 text-emerald-600 dark:text-emerald-400 text-xs mb-4">
                 <CheckCircle2 size={13} />
                 <span>Code entered</span>
               </div>
@@ -195,7 +195,7 @@ export default function LoginPage() {
               <button
                 onClick={onResend}
                 disabled={resendCooldown > 0}
-                className="text-violet-400 font-semibold hover:text-violet-300 transition-colors disabled:text-slate-600 disabled:cursor-not-allowed"
+                className="text-violet-600 dark:text-violet-400 font-semibold hover:text-violet-700 dark:hover:text-violet-300 transition-colors disabled:text-slate-600 disabled:cursor-not-allowed"
               >
                 {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : "Resend code"}
               </button>
@@ -203,7 +203,7 @@ export default function LoginPage() {
 
             <button
               onClick={() => { setStep("login"); setCode(["", "", "", "", "", ""]); setError(""); setResendMsg(""); }}
-              className="mt-3 text-sm text-slate-500 hover:text-slate-300 transition-colors"
+              className="mt-3 text-sm text-slate-500 hover:text-slate-800 dark:hover:text-slate-300 transition-colors"
             >
               ← Back to sign in
             </button>
@@ -214,7 +214,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-surface-0 flex overflow-hidden">
+    <div className="min-h-screen bg-slate-50 dark:bg-surface-0 flex overflow-hidden">
       {/* Background orbs */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <div className="glow-orb w-[600px] h-[600px] bg-violet-600/20 -top-48 -left-24 animate-blob" />
@@ -228,17 +228,17 @@ export default function LoginPage() {
           <div className="w-9 h-9 rounded-xl bg-brand-gradient flex items-center justify-center shadow-glow-sm">
             <TrendingUp size={18} className="text-white" />
           </div>
-          <span className="text-white font-bold text-lg tracking-tight">FinCopilot</span>
+          <span className="text-slate-900 dark:text-white font-bold text-lg tracking-tight">FinCopilot</span>
         </div>
 
         <div>
           <div className="mb-10">
-            <h2 className="text-4xl font-bold text-white leading-[1.15] mb-4">
+            <h2 className="text-4xl font-bold text-slate-900 dark:text-white leading-[1.15] mb-4">
               Your money,{" "}
               <span className="text-gradient">intelligently</span>{" "}
               managed.
             </h2>
-            <p className="text-slate-400 text-base leading-relaxed max-w-xs">
+            <p className="text-slate-500 dark:text-slate-400 text-base leading-relaxed max-w-xs">
               AI-powered personal finance that helps you spend smarter and save faster — all in one dashboard.
             </p>
           </div>
@@ -247,9 +247,9 @@ export default function LoginPage() {
             {FEATURES.map(({ icon: Icon, label, desc }) => (
               <div key={label} className="glass p-4 rounded-xl group hover:border-violet-500/20 transition-all duration-200">
                 <div className="w-8 h-8 rounded-lg bg-violet-500/15 flex items-center justify-center mb-3 group-hover:bg-violet-500/25 transition-colors">
-                  <Icon size={15} className="text-violet-400" />
+                  <Icon size={15} className="text-violet-600 dark:text-violet-400" />
                 </div>
-                <p className="text-sm font-semibold text-white mb-0.5">{label}</p>
+                <p className="text-sm font-semibold text-slate-900 dark:text-white mb-0.5">{label}</p>
                 <p className="text-xs text-slate-500">{desc}</p>
               </div>
             ))}
@@ -267,19 +267,19 @@ export default function LoginPage() {
             <div className="w-8 h-8 rounded-xl bg-brand-gradient flex items-center justify-center">
               <TrendingUp size={15} className="text-white" />
             </div>
-            <span className="text-white font-bold tracking-tight">FinCopilot</span>
+            <span className="text-slate-900 dark:text-white font-bold tracking-tight">FinCopilot</span>
           </div>
 
           <div className="glass p-8 rounded-2xl shadow-glass">
             {/* Header */}
             <div className="mb-7">
-              <h1 className="text-2xl font-bold text-white mb-1.5 tracking-tight">Welcome back</h1>
-              <p className="text-slate-400 text-sm">Enter your email and we&apos;ll send you a sign-in code</p>
+              <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-1.5 tracking-tight">Welcome back</h1>
+              <p className="text-slate-500 dark:text-slate-400 text-sm">Enter your email and we&apos;ll send you a sign-in code</p>
             </div>
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Email</label>
+                <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Email</label>
                 <input
                   {...register("email")}
                   type="email"
@@ -287,12 +287,12 @@ export default function LoginPage() {
                   placeholder="you@example.com"
                   autoComplete="email"
                 />
-                {errors.email && <p className="text-rose-400 text-xs mt-1.5">{errors.email.message}</p>}
+                {errors.email && <p className="text-rose-600 dark:text-rose-400 text-xs mt-1.5">{errors.email.message}</p>}
               </div>
 
               {error && (
                 <div className="bg-rose-500/10 border border-rose-500/20 rounded-xl px-4 py-3">
-                  <p className="text-rose-400 text-sm">{error}</p>
+                  <p className="text-rose-600 dark:text-rose-400 text-sm">{error}</p>
                 </div>
               )}
 
@@ -321,7 +321,7 @@ export default function LoginPage() {
 
             <p className="text-center text-sm text-slate-500">
               Don&apos;t have an account?{" "}
-              <Link href="/register" className="text-violet-400 font-semibold hover:text-violet-300 transition-colors">
+              <Link href="/register" className="text-violet-600 dark:text-violet-400 font-semibold hover:text-violet-700 dark:hover:text-violet-300 transition-colors">
                 Create one free
               </Link>
             </p>

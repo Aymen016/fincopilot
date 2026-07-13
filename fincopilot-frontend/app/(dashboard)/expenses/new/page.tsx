@@ -33,20 +33,20 @@ export default function NewExpensePage() {
     <div className="p-6 max-w-xl animate-fade-in">
       <button
         onClick={() => router.back()}
-        className="flex items-center gap-2 text-sm text-slate-500 hover:text-slate-300 mb-6 transition-colors"
+        className="flex items-center gap-2 text-sm text-slate-500 hover:text-slate-800 dark:hover:text-slate-300 mb-6 transition-colors"
       >
         <ArrowLeft size={15} /> Back
       </button>
 
       <div className="mb-6">
-        <h1 className="text-xl font-bold text-white tracking-tight">Add Expense</h1>
+        <h1 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">Add Expense</h1>
         <p className="text-sm text-slate-500 mt-0.5">Record a new transaction</p>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="glass rounded-2xl p-6 space-y-5">
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Amount (PKR)</label>
+            <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Amount (PKR)</label>
             <input
               {...register("amount")}
               type="number"
@@ -54,33 +54,32 @@ export default function NewExpensePage() {
               className="input-dark"
               placeholder="0"
             />
-            {errors.amount && <p className="text-rose-400 text-xs mt-1.5">{errors.amount.message}</p>}
+            {errors.amount && <p className="text-rose-600 dark:text-rose-400 text-xs mt-1.5">{errors.amount.message}</p>}
           </div>
           <div>
-            <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Date</label>
+            <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Date</label>
             <input
               {...register("expense_date")}
               type="date"
               className="input-dark"
-              style={{ colorScheme: "dark" }}
             />
-            {errors.expense_date && <p className="text-rose-400 text-xs mt-1.5">{errors.expense_date.message}</p>}
+            {errors.expense_date && <p className="text-rose-600 dark:text-rose-400 text-xs mt-1.5">{errors.expense_date.message}</p>}
           </div>
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Description</label>
+          <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Description</label>
           <input
             {...register("description")}
             className="input-dark"
             placeholder="e.g. Starbucks coffee"
           />
-          {errors.description && <p className="text-rose-400 text-xs mt-1.5">{errors.description.message}</p>}
+          {errors.description && <p className="text-rose-600 dark:text-rose-400 text-xs mt-1.5">{errors.description.message}</p>}
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
-            Merchant <span className="text-slate-600 normal-case font-normal">(optional)</span>
+          <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">
+            Merchant <span className="text-slate-400 dark:text-slate-600 normal-case font-normal">(optional)</span>
           </label>
           <input
             {...register("merchant")}
@@ -90,11 +89,10 @@ export default function NewExpensePage() {
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Category</label>
+          <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Category</label>
           <select
             {...register("category_id")}
             className="input-dark"
-            style={{ colorScheme: "dark" }}
             disabled={catsLoading}
           >
             <option value="">— Select a category —</option>
@@ -102,7 +100,7 @@ export default function NewExpensePage() {
               <option key={cat.id} value={cat.id}>{cat.icon} {cat.name}</option>
             ))}
           </select>
-          {errors.category_id && <p className="text-rose-400 text-xs mt-1.5">{errors.category_id.message}</p>}
+          {errors.category_id && <p className="text-rose-600 dark:text-rose-400 text-xs mt-1.5">{errors.category_id.message}</p>}
         </div>
 
         <button

@@ -58,16 +58,16 @@ export function InsightCard({ insight, onDismiss }: { insight: Insight; onDismis
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1.5">
-            <p className="font-semibold text-sm text-slate-100">{insight.title}</p>
+            <p className="font-semibold text-sm text-slate-900 dark:text-slate-100">{insight.title}</p>
             <span className={`badge ${cfg.badge}`}>{insight.severity}</span>
           </div>
-          <p className="text-sm text-slate-400 leading-relaxed">{insight.body}</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">{insight.body}</p>
         </div>
 
         {onDismiss && (
           <button
             onClick={onDismiss}
-            className="opacity-0 group-hover:opacity-100 text-slate-600 hover:text-slate-300 transition-all shrink-0 p-1 rounded-lg hover:bg-white/[0.06]"
+            className="opacity-0 group-hover:opacity-100 text-slate-500 dark:text-slate-600 hover:text-slate-800 dark:hover:text-slate-300 transition-all shrink-0 p-1 rounded-lg hover:bg-slate-900/[0.06] dark:hover:bg-white/[0.06]"
           >
             <X size={13} />
           </button>

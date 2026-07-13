@@ -96,7 +96,6 @@ export default function BudgetsPage() {
               value={formData.category_id}
               onChange={(e) => setFormData((f) => ({ ...f, category_id: e.target.value }))}
               className="input-dark"
-              style={{ colorScheme: "dark" }}
             >
               <option value="">Select category</option>
               {categories?.map((c: any) => (

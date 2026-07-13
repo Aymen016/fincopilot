@@ -30,7 +30,7 @@ export function BudgetGauge({ budget, onUpdate, onDelete }: Props) {
   const isNear = !isOver && pct >= 80;
   const barColor = isOver ? "bg-rose-500" : isNear ? "bg-amber-400" : "bg-emerald-500";
   const statusText = isOver ? "Over budget" : isNear ? "Near limit" : "On track";
-  const statusColor = isOver ? "text-rose-400" : isNear ? "text-amber-400" : "text-emerald-400";
+  const statusColor = isOver ? "text-rose-600 dark:text-rose-400" : isNear ? "text-amber-600 dark:text-amber-400" : "text-emerald-600 dark:text-emerald-400";
   const glowBorder = isOver ? "group-hover:border-rose-500/20" : isNear ? "group-hover:border-amber-500/20" : "group-hover:border-emerald-500/20";
 
   const handleSave = async () => {
@@ -51,11 +51,11 @@ export function BudgetGauge({ budget, onUpdate, onDelete }: Props) {
     <div className={`glass glass-hover rounded-2xl p-5 group ${glowBorder} transition-all duration-200`}>
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-white/[0.05] border border-white/[0.06] flex items-center justify-center text-lg flex-shrink-0">
+          <div className="w-9 h-9 rounded-xl bg-slate-900/[0.05] dark:bg-white/[0.05] border border-slate-900/[0.06] dark:border-white/[0.06] flex items-center justify-center text-lg flex-shrink-0">
             {budget.category.icon}
           </div>
           <div>
-            <p className="font-semibold text-slate-100 text-sm">{budget.category.name}</p>
+            <p className="font-semibold text-slate-900 dark:text-slate-100 text-sm">{budget.category.name}</p>
             <p className={`text-xs font-semibold ${statusColor}`}>{statusText}</p>
           </div>
         </div>
@@ -64,13 +64,13 @@ export function BudgetGauge({ budget, onUpdate, onDelete }: Props) {
             <>
               <button
                 onClick={() => { setValue(String(budget.amount_limit)); setEditing(true); }}
-                className="p-1.5 rounded-lg text-slate-600 hover:text-violet-400 hover:bg-violet-500/10 transition-colors"
+                className="p-1.5 rounded-lg text-slate-500 dark:text-slate-600 hover:text-violet-600 dark:hover:text-violet-400 hover:bg-violet-500/10 transition-colors"
               >
                 <Pencil size={13} />
               </button>
               <button
                 onClick={handleDelete}
-                className="p-1.5 rounded-lg text-slate-600 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
+                className="p-1.5 rounded-lg text-slate-500 dark:text-slate-600 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
               >
                 <Trash2 size={13} />
               </button>
@@ -81,13 +81,13 @@ export function BudgetGauge({ budget, onUpdate, onDelete }: Props) {
               <button
                 onClick={handleSave}
                 disabled={saving}
-                className="p-1.5 rounded-lg text-emerald-400 hover:bg-emerald-500/10 transition-colors disabled:opacity-50"
+                className="p-1.5 rounded-lg text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10 transition-colors disabled:opacity-50"
               >
                 <Check size={13} />
               </button>
               <button
                 onClick={() => setEditing(false)}
-                className="p-1.5 rounded-lg text-slate-500 hover:bg-white/[0.05] transition-colors"
+                className="p-1.5 rounded-lg text-slate-500 hover:bg-slate-900/[0.05] dark:hover:bg-white/[0.05] transition-colors"
               >
                 <X size={13} />
               </button>
@@ -110,7 +110,7 @@ export function BudgetGauge({ budget, onUpdate, onDelete }: Props) {
         </div>
       )}
 
-      <div className="w-full bg-white/[0.06] rounded-full h-1.5 mb-3 overflow-hidden">
+      <div className="w-full bg-slate-900/[0.07] dark:bg-white/[0.06] rounded-full h-1.5 mb-3 overflow-hidden">
         <div
           className={`h-1.5 rounded-full transition-all duration-700 ${barColor}`}
           style={{ width: `${pct}%` }}
@@ -118,12 +118,12 @@ export function BudgetGauge({ budget, onUpdate, onDelete }: Props) {
       </div>
 
       <div className="flex justify-between text-xs text-slate-500">
-        <span className="font-medium text-slate-300">
-          {formatCurrency(budget.spent)} <span className="font-normal text-slate-600">spent</span>
+        <span className="font-medium text-slate-800 dark:text-slate-300">
+          {formatCurrency(budget.spent)} <span className="font-normal text-slate-500 dark:text-slate-600">spent</span>
         </span>
         <span>
           {isOver ? (
-            <span className="text-rose-400 font-semibold">{formatCurrency(budget.spent - budget.amount_limit)} over</span>
+            <span className="text-rose-600 dark:text-rose-400 font-semibold">{formatCurrency(budget.spent - budget.amount_limit)} over</span>
           ) : (
             <span>{formatCurrency(remaining)} left of {formatCurrency(budget.amount_limit)}</span>
           )}

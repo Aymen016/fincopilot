@@ -23,7 +23,7 @@ export default function ExpensesPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-white tracking-tight">Expenses</h1>
+          <h1 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">Expenses</h1>
           <p className="text-sm text-slate-500 mt-0.5">
             {data?.total != null ? `${data.total} total transactions` : "Loading…"}
           </p>
@@ -63,7 +63,7 @@ export default function ExpensesPage() {
           {(dateFrom || dateTo) && (
             <button
               onClick={() => { setDateFrom(""); setDateTo(""); setPage(1); }}
-              className="text-xs text-violet-400 hover:text-violet-300 font-semibold transition-colors ml-auto"
+              className="text-xs text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 font-semibold transition-colors ml-auto"
             >
               Clear filters
             </button>
@@ -76,11 +76,11 @@ export default function ExpensesPage() {
         <ExpenseTable expenses={data?.items ?? []} onMutate={mutate} />
         {(!data?.items?.length) && (
           <div className="flex flex-col items-center justify-center py-16 gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-white/[0.03] border border-white/[0.06] flex items-center justify-center">
-              <Receipt size={20} className="text-slate-600" />
+            <div className="w-12 h-12 rounded-2xl bg-slate-900/[0.03] dark:bg-white/[0.03] border border-slate-900/[0.06] dark:border-white/[0.06] flex items-center justify-center">
+              <Receipt size={20} className="text-slate-400 dark:text-slate-600" />
             </div>
             <p className="text-slate-500 text-sm">No expenses found</p>
-            <Link href="/expenses/new" className="text-violet-400 text-xs font-semibold hover:text-violet-300 transition-colors">
+            <Link href="/expenses/new" className="text-violet-600 dark:text-violet-400 text-xs font-semibold hover:text-violet-700 dark:hover:text-violet-300 transition-colors">
               + Add your first expense
             </Link>
           </div>
@@ -106,8 +106,8 @@ export default function ExpensesPage() {
                   onClick={() => setPage(pageNum)}
                   className={`w-8 h-8 rounded-lg text-xs font-semibold transition-all ${
                     page === pageNum
-                      ? "bg-violet-500/20 text-violet-300 border border-violet-500/30"
-                      : "text-slate-500 hover:bg-white/[0.04] hover:text-slate-300"
+                      ? "bg-violet-500/20 text-violet-700 dark:text-violet-300 border border-violet-500/30"
+                      : "text-slate-500 hover:bg-slate-900/[0.04] dark:hover:bg-white/[0.04] hover:text-slate-800 dark:hover:text-slate-300"
                   }`}
                 >
                   {pageNum}
