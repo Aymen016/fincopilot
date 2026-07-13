@@ -15,14 +15,27 @@ function handleUnauthorized() {
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const token = getToken();
-  const res = await fetch(`${API_URL}${path}`, {
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...options.headers,
-    },
-  });
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 30000);
+  let res: Response;
+  try {
+    res = await fetch(`${API_URL}${path}`, {
+      ...options,
+      signal: controller.signal,
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...options.headers,
+      },
+    });
+  } catch (e: any) {
+    if (e?.name === "AbortError") {
+      throw new Error("The server took too long to respond. Please try again.");
+    }
+    throw new Error("Can't reach the server. Please check your connection and try again.");
+  } finally {
+    clearTimeout(timeout);
+  }
 
   if (res.status === 401) {
     const hadToken = !!getToken();
