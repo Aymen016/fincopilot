@@ -82,22 +82,7 @@ def _build_message(to_email: str, code: str, sender: str) -> MIMEMultipart:
 
 
 async def send_verification_email(to_email: str, code: str) -> None:
-    # --- SMTP path (Gmail or any SMTP provider) ---
-    if settings.smtp_host and settings.smtp_user and settings.smtp_password:
-        sender = settings.email_from or f"FinCopilot <{settings.smtp_user}>"
-        msg = _build_message(to_email, code, sender)
-        await aiosmtplib.send(
-            msg,
-            hostname=settings.smtp_host,
-            port=settings.smtp_port,
-            username=settings.smtp_user,
-            password=settings.smtp_password,
-            start_tls=True,
-            timeout=15,
-        )
-        return
-
-    # --- Resend API path ---
+    # --- Resend API path (preferred: works on hosts that block SMTP ports) ---
     if settings.resend_api_key:
         # Always use Resend's own sending domain — using a gmail/unverified address
         # as the sender will cause a 403. EMAIL_FROM is only for SMTP.
@@ -120,6 +105,21 @@ async def send_verification_email(to_email: str, code: str) -> None:
             )
             print(f"[Resend] to={recipient} status={resp.status_code} body={resp.text}")
             resp.raise_for_status()
+        return
+
+    # --- SMTP path (Gmail or any SMTP provider) ---
+    if settings.smtp_host and settings.smtp_user and settings.smtp_password:
+        sender = settings.email_from or f"FinCopilot <{settings.smtp_user}>"
+        msg = _build_message(to_email, code, sender)
+        await aiosmtplib.send(
+            msg,
+            hostname=settings.smtp_host,
+            port=settings.smtp_port,
+            username=settings.smtp_user,
+            password=settings.smtp_password,
+            start_tls=True,
+            timeout=15,
+        )
         return
 
     # --- Dev fallback ---
