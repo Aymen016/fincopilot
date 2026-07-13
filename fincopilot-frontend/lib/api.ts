@@ -46,7 +46,7 @@ export const apiClient = {
   // Auth
   getMe: () => request<any>("/auth/me"),
   login: (email: string, password: string) =>
-    request<{ access_token: string; refresh_token: string; token_type: string }>("/auth/token", {
+    request<{ message: string }>("/auth/token", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: new URLSearchParams({ username: email, password }),
@@ -56,6 +56,9 @@ export const apiClient = {
 
   verifyEmail: (email: string, code: string) =>
     request("/auth/verify-email", { method: "POST", body: JSON.stringify({ email, code }) }),
+
+  resendCode: (email: string) =>
+    request<{ message: string }>("/auth/resend-code", { method: "POST", body: JSON.stringify({ email }) }),
 
   // Expenses
   getExpenses: (params: Record<string, any> = {}) => {

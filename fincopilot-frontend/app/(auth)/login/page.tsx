@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { apiClient } from "@/lib/api";
 import { useAuthStore } from "@/lib/store/auth";
-import { TrendingUp, ArrowRight, Sparkles, Shield, Target, Zap, Eye, EyeOff } from "lucide-react";
+import { TrendingUp, ArrowRight, Sparkles, Shield, Target, Zap, Eye, EyeOff, Mail, CheckCircle2 } from "lucide-react";
 
 const schema = z.object({
   email: z.string().email(),
@@ -27,21 +27,193 @@ export default function LoginPage() {
   const setTokens = useAuthStore((s) => s.setTokens);
   const [error, setError] = useState("");
   const [showPw, setShowPw] = useState(false);
+  const [step, setStep] = useState<"login" | "verify">("login");
+  const [pendingEmail, setPendingEmail] = useState("");
+  const [code, setCode] = useState(["", "", "", "", "", ""]);
+  const [verifying, setVerifying] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
+  const [resendMsg, setResendMsg] = useState("");
+  const codeRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormData>({
     resolver: zodResolver(schema),
   });
 
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const t = setTimeout(() => setResendCooldown((c) => c - 1), 1000);
+    return () => clearTimeout(t);
+  }, [resendCooldown]);
+
   const onSubmit = async (data: FormData) => {
     setError("");
     try {
-      const res = await apiClient.login(data.email, data.password);
-      setTokens(res.access_token, res.refresh_token);
-      router.push("/dashboard");
+      await apiClient.login(data.email, data.password);
+      setPendingEmail(data.email);
+      setStep("verify");
+      setResendCooldown(30);
     } catch (e: any) {
       setError(e.message || "Login failed");
     }
   };
+
+  const onResend = async () => {
+    if (resendCooldown > 0) return;
+    setError("");
+    setResendMsg("");
+    try {
+      await apiClient.resendCode(pendingEmail);
+      setResendMsg("A new code has been sent.");
+      setResendCooldown(30);
+    } catch (e: any) {
+      setError(e.message || "Couldn't resend code");
+    }
+  };
+
+  const handleCodeInput = (idx: number, val: string) => {
+    const digit = val.replace(/\D/g, "").slice(-1);
+    const next = [...code];
+    next[idx] = digit;
+    setCode(next);
+    if (digit && idx < 5) codeRefs.current[idx + 1]?.focus();
+    if (!digit && idx > 0) codeRefs.current[idx - 1]?.focus();
+  };
+
+  const handleCodePaste = (e: React.ClipboardEvent) => {
+    e.preventDefault();
+    const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
+    if (pasted) {
+      const next = pasted.split("").concat(Array(6).fill("")).slice(0, 6);
+      setCode(next);
+      codeRefs.current[Math.min(pasted.length, 5)]?.focus();
+    }
+  };
+
+  const onVerify = async () => {
+    const fullCode = code.join("");
+    if (fullCode.length !== 6) return;
+    setVerifying(true);
+    setError("");
+    try {
+      const tokens = await apiClient.verifyEmail(pendingEmail, fullCode) as { access_token: string; refresh_token: string };
+      setTokens(tokens.access_token, tokens.refresh_token);
+      router.push("/dashboard");
+    } catch (e: any) {
+      setError(e.message || "Invalid code");
+    } finally {
+      setVerifying(false);
+    }
+  };
+
+  if (step === "verify") {
+    const fullCode = code.join("");
+    return (
+      <div className="min-h-screen bg-surface-0 flex items-center justify-center p-8 overflow-hidden">
+        {/* Background orbs */}
+        <div className="fixed inset-0 pointer-events-none overflow-hidden">
+          <div className="glow-orb w-[600px] h-[600px] bg-violet-600/20 -top-48 -left-24 animate-blob" />
+          <div className="glow-orb w-[400px] h-[400px] bg-sky-500/10 -bottom-32 left-1/3 animate-blob" style={{ animationDelay: "4s" }} />
+        </div>
+
+        <div className="w-full max-w-md relative z-10 animate-fade-in-up">
+          <div className="glass p-8 rounded-2xl shadow-glass text-center">
+            <div className="w-16 h-16 rounded-2xl bg-violet-500/15 border border-violet-500/20 flex items-center justify-center mx-auto mb-6">
+              <Mail size={28} className="text-violet-400" />
+            </div>
+
+            <h1 className="text-2xl font-bold text-white mb-2 tracking-tight">Verify it&apos;s you</h1>
+            <p className="text-slate-400 text-sm mb-8 leading-relaxed">
+              We sent a 6-digit verification code to{" "}
+              <span className="text-white font-medium">{pendingEmail}</span>
+            </p>
+
+            {/* OTP input */}
+            <div className="flex gap-2 justify-center mb-6" onPaste={handleCodePaste}>
+              {code.map((digit, idx) => (
+                <input
+                  key={idx}
+                  ref={el => { codeRefs.current[idx] = el; }}
+                  type="text"
+                  inputMode="numeric"
+                  maxLength={1}
+                  value={digit}
+                  onChange={e => handleCodeInput(idx, e.target.value)}
+                  onKeyDown={e => {
+                    if (e.key === "Backspace" && !digit && idx > 0) {
+                      codeRefs.current[idx - 1]?.focus();
+                    }
+                  }}
+                  className={`w-11 h-13 text-center text-xl font-bold rounded-xl border transition-all duration-200 outline-none bg-white/[0.04] text-white
+                    ${digit
+                      ? "border-violet-500/60 bg-violet-500/10 shadow-glow-sm"
+                      : "border-white/10 focus:border-violet-500/50 focus:bg-white/[0.06]"
+                    }`}
+                  style={{ height: "3.25rem" }}
+                />
+              ))}
+            </div>
+
+            {error && (
+              <div className="bg-rose-500/10 border border-rose-500/20 rounded-xl px-4 py-3 mb-4">
+                <p className="text-rose-400 text-sm">{error}</p>
+              </div>
+            )}
+
+            {resendMsg && !error && (
+              <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl px-4 py-3 mb-4">
+                <p className="text-emerald-400 text-sm">{resendMsg}</p>
+              </div>
+            )}
+
+            {fullCode.length === 6 && (
+              <div className="flex items-center justify-center gap-1.5 text-emerald-400 text-xs mb-4">
+                <CheckCircle2 size={13} />
+                <span>Code entered</span>
+              </div>
+            )}
+
+            <button
+              onClick={onVerify}
+              disabled={fullCode.length !== 6 || verifying}
+              className="btn-brand w-full py-3 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {verifying ? (
+                <span className="flex items-center gap-2 justify-center">
+                  <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                  Verifying…
+                </span>
+              ) : (
+                <span className="flex items-center gap-2 justify-center">
+                  Verify &amp; continue <ArrowRight size={15} />
+                </span>
+              )}
+            </button>
+
+            <div className="mt-5 text-sm text-slate-500">
+              Didn&apos;t get it?{" "}
+              <button
+                onClick={onResend}
+                disabled={resendCooldown > 0}
+                className="text-violet-400 font-semibold hover:text-violet-300 transition-colors disabled:text-slate-600 disabled:cursor-not-allowed"
+              >
+                {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : "Resend code"}
+              </button>
+            </div>
+
+            <button
+              onClick={() => { setStep("login"); setCode(["", "", "", "", "", ""]); setError(""); setResendMsg(""); }}
+              className="mt-3 text-sm text-slate-500 hover:text-slate-300 transition-colors"
+            >
+              ← Back to sign in
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-surface-0 flex overflow-hidden">
@@ -158,7 +330,7 @@ export default function LoginPage() {
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                     </svg>
-                    Signing in…
+                    Sending code…
                   </span>
                 ) : (
                   <span className="flex items-center gap-2">

@@ -9,7 +9,7 @@ from app.database import get_db
 from app.dependencies import get_current_user
 from app.models.user import User
 from app.repositories.user_repo import UserRepository
-from app.schemas.user import UserCreate, UserResponse, TokenResponse, TokenRefresh, VerifyEmailRequest
+from app.schemas.user import UserCreate, UserResponse, TokenResponse, TokenRefresh, VerifyEmailRequest, ResendCodeRequest
 from app.utils.security import hash_password, verify_password, create_access_token, create_refresh_token, decode_access_token
 from app.utils.email_service import send_verification_email
 
@@ -53,6 +53,28 @@ async def register(data: UserCreate, db: AsyncSession = Depends(get_db)):
     return {"message": "Verification code sent to your email"}
 
 
+@router.post("/resend-code", status_code=202)
+async def resend_code(data: ResendCodeRequest, db: AsyncSession = Depends(get_db)):
+    repo = UserRepository(db)
+    user = await repo.get_by_email(data.email)
+    # Always return 202 so we don't reveal whether an email is registered
+    if not user:
+        return {"message": "If that account exists, a new code has been sent"}
+
+    code = _generate_code()
+    expires = datetime.now(timezone.utc) + timedelta(minutes=15)
+    await repo.update(user.id, {
+        "verification_code": code,
+        "code_expires_at": expires,
+    })
+
+    try:
+        await send_verification_email(user.email, code)
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=f"Failed to send verification email: {e}")
+    return {"message": "A new verification code has been sent"}
+
+
 @router.post("/verify-email", response_model=TokenResponse)
 async def verify_email(data: VerifyEmailRequest, db: AsyncSession = Depends(get_db)):
     repo = UserRepository(db)
@@ -79,18 +101,26 @@ async def verify_email(data: VerifyEmailRequest, db: AsyncSession = Depends(get_
     )
 
 
-@router.post("/token", response_model=TokenResponse)
+@router.post("/token", status_code=202)
 async def login(form: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_db)):
     repo = UserRepository(db)
     user = await repo.get_by_email(form.username)
     if not user or not verify_password(form.password, user.hashed_password):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect email or password")
-    if not user.is_verified:
-        raise HTTPException(status_code=403, detail="Please verify your email before logging in")
-    return TokenResponse(
-        access_token=create_access_token(str(user.id)),
-        refresh_token=create_refresh_token(str(user.id)),
-    )
+
+    # Send a fresh verification code on every login (email OTP)
+    code = _generate_code()
+    expires = datetime.now(timezone.utc) + timedelta(minutes=15)
+    await repo.update(user.id, {
+        "verification_code": code,
+        "code_expires_at": expires,
+    })
+
+    try:
+        await send_verification_email(user.email, code)
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=f"Failed to send verification email: {e}")
+    return {"message": "Verification code sent to your email"}
 
 
 @router.get("/me", response_model=UserResponse)

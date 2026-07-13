@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
@@ -30,11 +30,19 @@ export default function RegisterPage() {
   const [code, setCode] = useState(["", "", "", "", "", ""]);
   const [verifying, setVerifying] = useState(false);
   const [showPw, setShowPw] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
+  const [resendMsg, setResendMsg] = useState("");
   const codeRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormData>({
     resolver: zodResolver(schema),
   });
+
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const t = setTimeout(() => setResendCooldown((c) => c - 1), 1000);
+    return () => clearTimeout(t);
+  }, [resendCooldown]);
 
   const onSubmit = async (data: FormData) => {
     setError("");
@@ -42,8 +50,22 @@ export default function RegisterPage() {
       await apiClient.register(data.full_name, data.email, data.password);
       setPendingEmail(data.email);
       setStep("verify");
+      setResendCooldown(30);
     } catch (e: any) {
       setError(e.message || "Registration failed");
+    }
+  };
+
+  const onResend = async () => {
+    if (resendCooldown > 0) return;
+    setError("");
+    setResendMsg("");
+    try {
+      await apiClient.resendCode(pendingEmail);
+      setResendMsg("A new code has been sent.");
+      setResendCooldown(30);
+    } catch (e: any) {
+      setError(e.message || "Couldn't resend code");
     }
   };
 
@@ -176,6 +198,12 @@ export default function RegisterPage() {
                 </div>
               )}
 
+              {resendMsg && !error && (
+                <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl px-4 py-3 mb-4">
+                  <p className="text-emerald-400 text-sm">{resendMsg}</p>
+                </div>
+              )}
+
               {fullCode.length === 6 && (
                 <div className="flex items-center justify-center gap-1.5 text-emerald-400 text-xs mb-4">
                   <CheckCircle2 size={13} />
@@ -203,9 +231,20 @@ export default function RegisterPage() {
                 )}
               </button>
 
+              <div className="mt-5 text-sm text-slate-500">
+                Didn&apos;t get it?{" "}
+                <button
+                  onClick={onResend}
+                  disabled={resendCooldown > 0}
+                  className="text-violet-400 font-semibold hover:text-violet-300 transition-colors disabled:text-slate-600 disabled:cursor-not-allowed"
+                >
+                  {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : "Resend code"}
+                </button>
+              </div>
+
               <button
-                onClick={() => { setStep("register"); setCode(["", "", "", "", "", ""]); setError(""); }}
-                className="mt-4 text-sm text-slate-500 hover:text-slate-300 transition-colors"
+                onClick={() => { setStep("register"); setCode(["", "", "", "", "", ""]); setError(""); setResendMsg(""); }}
+                className="mt-3 text-sm text-slate-500 hover:text-slate-300 transition-colors"
               >
                 ← Use a different email
               </button>

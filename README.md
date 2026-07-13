@@ -54,7 +54,29 @@
 
 ---
 
-## 🚀 Quick Start
+## ☁️ Deployment Architecture
+
+In production, the three tiers run on separate free-tier platforms:
+
+```
+Browser (Vercel frontend)
+        ↓  API calls (HTTPS + WebSocket)
+FastAPI backend (Hugging Face Space)
+        ↓  DATABASE_URL
+PostgreSQL database (Supabase)  ← this is where data is stored
+```
+
+| Tier | Platform | Notes |
+|------|----------|-------|
+| **Frontend** | Vercel | Next.js app; set `NEXT_PUBLIC_API_URL` and `NEXT_PUBLIC_WS_URL` to the backend URL |
+| **Backend** | Hugging Face Spaces (Docker) | FastAPI via `uvicorn`; serves REST + WebSocket |
+| **Database** | Supabase (PostgreSQL) | Connect via the async pooler string (`postgresql+asyncpg://...pooler.supabase.com:5432/...`) |
+
+> **Note:** Supabase free-tier projects auto-pause after 7 days of inactivity. If the backend fails to start with a `tenant/user ... not found` error, resume the project from the Supabase dashboard and restart the Space.
+>
+> **AI chat in production:** Ollama runs locally only, so it isn't available on the deployed backend. The chat panel detects this via `/api/v1/ai/status` and degrades gracefully to an "AI offline" state — everything else keeps working.
+
+---
 
 ### Prerequisites
 
@@ -239,6 +261,22 @@ ANTHROPIC_API_KEY=
 # Frontend
 NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
 NEXT_PUBLIC_WS_URL=ws://localhost:8000
+```
+
+### Production values
+
+When deployed (Vercel + Hugging Face + Supabase), use these instead:
+
+```env
+# Backend (set on the Hugging Face Space → Settings → Variables and secrets)
+SECRET_KEY=<random 32+ char string>
+DATABASE_URL=postgresql+asyncpg://postgres.<ref>:<password>@aws-0-<region>.pooler.supabase.com:5432/postgres
+ENVIRONMENT=production
+ALLOWED_ORIGINS=https://<your-app>.vercel.app
+
+# Frontend (set on Vercel → Settings → Environment Variables) — no /api/v1 suffix
+NEXT_PUBLIC_API_URL=https://<username>-<space>.hf.space
+NEXT_PUBLIC_WS_URL=wss://<username>-<space>.hf.space
 ```
 
 ---

@@ -33,3 +33,7 @@ class TokenRefresh(BaseModel):
 class VerifyEmailRequest(BaseModel):
     email: EmailStr
     code: str
+
+
+class ResendCodeRequest(BaseModel):
+    email: EmailStr

@@ -2,6 +2,7 @@ services:
   - type: web
     name: fincopilot-api
     runtime: python
+    rootDir: fincopilot-backend
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
     envVars:
@@ -13,3 +14,5 @@ services:
         sync: false       # set manually in Render dashboard
       - key: ACCESS_TOKEN_EXPIRE_MINUTES
         value: 10080
+      - key: ALLOWED_ORIGINS
+        sync: false       # set to your Vercel URL, e.g. https://fincopilot-blue.vercel.app

@@ -6,7 +6,7 @@ from sqlalchemy import text
 
 from app.config import get_settings
 from app.database import engine, Base
-from app.api.v1 import auth, expenses, categories, budgets, goals, insights, forecast, health_score, chat
+from app.api.v1 import auth, expenses, categories, budgets, goals, insights, forecast, health_score, chat, ai_status
 
 settings = get_settings()
 
@@ -62,6 +62,7 @@ app.include_router(insights.router, prefix=PREFIX)
 app.include_router(forecast.router, prefix=PREFIX)
 app.include_router(health_score.router, prefix=PREFIX)
 app.include_router(chat.router, prefix=PREFIX)
+app.include_router(ai_status.router, prefix=PREFIX)
 
 
 @app.get("/health")
