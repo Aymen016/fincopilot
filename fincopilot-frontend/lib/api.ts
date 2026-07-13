@@ -16,7 +16,9 @@ function handleUnauthorized() {
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const token = getToken();
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 30000);
+  // Hugging Face Spaces sleep when idle and can take up to ~60s to cold-start,
+  // so allow a generous timeout before giving up.
+  const timeout = setTimeout(() => controller.abort(), 90000);
   let res: Response;
   try {
     res = await fetch(`${API_URL}${path}`, {
