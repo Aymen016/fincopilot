@@ -45,14 +45,13 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
 export const apiClient = {
   // Auth
   getMe: () => request<any>("/auth/me"),
-  login: (email: string, password: string) =>
+  login: (email: string) =>
     request<{ message: string }>("/auth/token", {
       method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams({ username: email, password }),
+      body: JSON.stringify({ email }),
     }),
-  register: (full_name: string, email: string, password: string) =>
-    request("/auth/register", { method: "POST", body: JSON.stringify({ full_name, email, password }) }),
+  register: (full_name: string, email: string) =>
+    request("/auth/register", { method: "POST", body: JSON.stringify({ full_name, email }) }),
 
   verifyEmail: (email: string, code: string) =>
     request("/auth/verify-email", { method: "POST", body: JSON.stringify({ email, code }) }),

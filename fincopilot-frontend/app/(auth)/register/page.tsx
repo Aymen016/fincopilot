@@ -6,12 +6,11 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { apiClient } from "@/lib/api";
-import { TrendingUp, ArrowRight, Mail, CheckCircle2, Eye, EyeOff, Sparkles, Shield, Target, Zap } from "lucide-react";
+import { TrendingUp, ArrowRight, Mail, CheckCircle2, Sparkles, Shield, Target, Zap } from "lucide-react";
 
 const schema = z.object({
   full_name: z.string().min(2),
   email: z.string().email(),
-  password: z.string().min(8, "Password must be at least 8 characters"),
 });
 type FormData = z.infer<typeof schema>;
 
@@ -29,7 +28,6 @@ export default function RegisterPage() {
   const [pendingEmail, setPendingEmail] = useState("");
   const [code, setCode] = useState(["", "", "", "", "", ""]);
   const [verifying, setVerifying] = useState(false);
-  const [showPw, setShowPw] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
   const [resendMsg, setResendMsg] = useState("");
   const codeRefs = useRef<(HTMLInputElement | null)[]>([]);
@@ -47,7 +45,7 @@ export default function RegisterPage() {
   const onSubmit = async (data: FormData) => {
     setError("");
     try {
-      await apiClient.register(data.full_name, data.email, data.password);
+      await apiClient.register(data.full_name, data.email);
       setPendingEmail(data.email);
       setStep("verify");
       setResendCooldown(30);
@@ -301,27 +299,6 @@ export default function RegisterPage() {
                   autoComplete="email"
                 />
                 {errors.email && <p className="text-rose-400 text-xs mt-1.5">{errors.email.message}</p>}
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Password</label>
-                <div className="relative">
-                  <input
-                    {...register("password")}
-                    type={showPw ? "text" : "password"}
-                    className="input-dark pr-10"
-                    placeholder="Min. 8 characters"
-                    autoComplete="new-password"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPw(v => !v)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors"
-                  >
-                    {showPw ? <EyeOff size={15} /> : <Eye size={15} />}
-                  </button>
-                </div>
-                {errors.password && <p className="text-rose-400 text-xs mt-1.5">{errors.password.message}</p>}
               </div>
 
               {error && (

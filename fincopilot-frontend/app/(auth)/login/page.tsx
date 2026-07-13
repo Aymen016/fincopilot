@@ -7,11 +7,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { apiClient } from "@/lib/api";
 import { useAuthStore } from "@/lib/store/auth";
-import { TrendingUp, ArrowRight, Sparkles, Shield, Target, Zap, Eye, EyeOff, Mail, CheckCircle2 } from "lucide-react";
+import { TrendingUp, ArrowRight, Sparkles, Shield, Target, Zap, Mail, CheckCircle2 } from "lucide-react";
 
 const schema = z.object({
   email: z.string().email(),
-  password: z.string().min(6),
 });
 type FormData = z.infer<typeof schema>;
 
@@ -26,7 +25,6 @@ export default function LoginPage() {
   const router = useRouter();
   const setTokens = useAuthStore((s) => s.setTokens);
   const [error, setError] = useState("");
-  const [showPw, setShowPw] = useState(false);
   const [step, setStep] = useState<"login" | "verify">("login");
   const [pendingEmail, setPendingEmail] = useState("");
   const [code, setCode] = useState(["", "", "", "", "", ""]);
@@ -48,7 +46,7 @@ export default function LoginPage() {
   const onSubmit = async (data: FormData) => {
     setError("");
     try {
-      await apiClient.login(data.email, data.password);
+      await apiClient.login(data.email);
       setPendingEmail(data.email);
       setStep("verify");
       setResendCooldown(30);
@@ -276,7 +274,7 @@ export default function LoginPage() {
             {/* Header */}
             <div className="mb-7">
               <h1 className="text-2xl font-bold text-white mb-1.5 tracking-tight">Welcome back</h1>
-              <p className="text-slate-400 text-sm">Sign in to your account to continue</p>
+              <p className="text-slate-400 text-sm">Enter your email and we&apos;ll send you a sign-in code</p>
             </div>
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -290,27 +288,6 @@ export default function LoginPage() {
                   autoComplete="email"
                 />
                 {errors.email && <p className="text-rose-400 text-xs mt-1.5">{errors.email.message}</p>}
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Password</label>
-                <div className="relative">
-                  <input
-                    {...register("password")}
-                    type={showPw ? "text" : "password"}
-                    className="input-dark pr-10"
-                    placeholder="••••••••"
-                    autoComplete="current-password"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPw(v => !v)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors"
-                  >
-                    {showPw ? <EyeOff size={15} /> : <Eye size={15} />}
-                  </button>
-                </div>
-                {errors.password && <p className="text-rose-400 text-xs mt-1.5">{errors.password.message}</p>}
               </div>
 
               {error && (
@@ -334,7 +311,7 @@ export default function LoginPage() {
                   </span>
                 ) : (
                   <span className="flex items-center gap-2">
-                    Sign in <ArrowRight size={15} />
+                    Send code <ArrowRight size={15} />
                   </span>
                 )}
               </button>

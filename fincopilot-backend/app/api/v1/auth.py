@@ -2,15 +2,14 @@ import random
 from datetime import datetime, timedelta, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
 from app.dependencies import get_current_user
 from app.models.user import User
 from app.repositories.user_repo import UserRepository
-from app.schemas.user import UserCreate, UserResponse, TokenResponse, TokenRefresh, VerifyEmailRequest, ResendCodeRequest
-from app.utils.security import hash_password, verify_password, create_access_token, create_refresh_token, decode_access_token
+from app.schemas.user import UserCreate, UserResponse, TokenResponse, TokenRefresh, VerifyEmailRequest, ResendCodeRequest, LoginRequest
+from app.utils.security import create_access_token, create_refresh_token, decode_access_token
 from app.utils.email_service import send_verification_email
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -39,7 +38,7 @@ async def register(data: UserCreate, db: AsyncSession = Depends(get_db)):
     else:
         await repo.create({
             "email": data.email,
-            "hashed_password": hash_password(data.password),
+            "hashed_password": "",
             "full_name": data.full_name,
             "is_verified": False,
             "verification_code": code,
@@ -102,13 +101,13 @@ async def verify_email(data: VerifyEmailRequest, db: AsyncSession = Depends(get_
 
 
 @router.post("/token", status_code=202)
-async def login(form: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_db)):
+async def login(data: LoginRequest, db: AsyncSession = Depends(get_db)):
     repo = UserRepository(db)
-    user = await repo.get_by_email(form.username)
-    if not user or not verify_password(form.password, user.hashed_password):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect email or password")
+    user = await repo.get_by_email(data.email)
+    if not user:
+        raise HTTPException(status_code=404, detail="No account found with that email. Please sign up first.")
 
-    # Send a fresh verification code on every login (email OTP)
+    # Passwordless login: send a fresh verification code every time
     code = _generate_code()
     expires = datetime.now(timezone.utc) + timedelta(minutes=15)
     await repo.update(user.id, {

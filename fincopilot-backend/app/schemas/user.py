@@ -5,7 +5,6 @@ from pydantic import BaseModel, EmailStr
 
 class UserCreate(BaseModel):
     email: EmailStr
-    password: str
     full_name: str
 
 
@@ -36,4 +35,8 @@ class VerifyEmailRequest(BaseModel):
 
 
 class ResendCodeRequest(BaseModel):
+    email: EmailStr
+
+
+class LoginRequest(BaseModel):
     email: EmailStr
