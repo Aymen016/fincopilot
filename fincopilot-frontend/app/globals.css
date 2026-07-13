@@ -164,6 +164,11 @@
     box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12);
   }
 
+  select.input-dark option {
+    background-color: #0b0c1a;
+    color: #f1f5f9;
+  }
+
   /* Badge */
   .badge {
     display: inline-flex;
