@@ -30,16 +30,32 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     if (hadToken) throw new Error("Session expired. Please log in again.");
     // No token → real auth error; surface the actual detail from the server
     const err = await res.json().catch(() => ({ detail: "Incorrect email or password" }));
-    throw new Error(err.detail || "Unauthorized");
+    throw new Error(parseDetail(err.detail) || "Unauthorized");
   }
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({ detail: res.statusText }));
-    throw new Error(err.detail || "Request failed");
+    throw new Error(parseDetail(err.detail) || "Request failed");
   }
 
   if (res.status === 204) return undefined as T;
   return res.json();
+}
+
+// FastAPI error `detail` can be a string OR an array of validation-error objects.
+// Normalise it to a readable message so the UI never shows "[object Object]".
+function parseDetail(detail: unknown): string {
+  if (!detail) return "";
+  if (typeof detail === "string") return detail;
+  if (Array.isArray(detail)) {
+    return detail
+      .map((d: any) => (typeof d === "string" ? d : d?.msg || JSON.stringify(d)))
+      .join(", ");
+  }
+  if (typeof detail === "object") {
+    return (detail as any).msg || JSON.stringify(detail);
+  }
+  return String(detail);
 }
 
 export const apiClient = {
