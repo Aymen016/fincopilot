@@ -38,7 +38,7 @@ export default function BudgetsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-white tracking-tight">Budgets</h1>
+          <h1 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">Budgets</h1>
           <p className="text-sm text-slate-500 mt-0.5">
             {now.toLocaleString("default", { month: "long" })} {now.getFullYear()}
           </p>
@@ -52,9 +52,9 @@ export default function BudgetsPage() {
       {budgets && budgets.length > 0 && (
         <div className="grid grid-cols-3 gap-4">
           {[
-            { label: "Total Budget", value: formatCurrency(totalBudget), accent: "text-violet-400" },
-            { label: "Total Spent", value: formatCurrency(totalSpent), accent: totalSpent > totalBudget ? "text-rose-400" : "text-white" },
-            { label: "Remaining", value: formatCurrency(remaining), accent: "text-emerald-400" },
+            { label: "Total Budget", value: formatCurrency(totalBudget), accent: "text-violet-600 dark:text-violet-400" },
+            { label: "Total Spent", value: formatCurrency(totalSpent), accent: totalSpent > totalBudget ? "text-rose-600 dark:text-rose-400" : "text-slate-900 dark:text-white" },
+            { label: "Remaining", value: formatCurrency(remaining), accent: "text-emerald-600 dark:text-emerald-400" },
           ].map(({ label, value, accent }) => (
             <div key={label} className="stat-card">
               <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">{label}</p>
@@ -69,18 +69,18 @@ export default function BudgetsPage() {
         <div className="glass rounded-2xl p-4 border-amber-500/20 bg-amber-500/[0.04]">
           <div className="flex items-center gap-2.5 mb-3">
             <div className="w-7 h-7 rounded-lg bg-amber-500/15 flex items-center justify-center">
-              <AlertTriangle size={13} className="text-amber-400" />
+              <AlertTriangle size={13} className="text-amber-600 dark:text-amber-400" />
             </div>
-            <p className="font-semibold text-amber-300 text-sm">Budget Alerts ({alerts.length})</p>
+            <p className="font-semibold text-amber-700 dark:text-amber-300 text-sm">Budget Alerts ({alerts.length})</p>
           </div>
           <div className="space-y-2">
             {alerts.map((alert: any, i: number) => (
-              <div key={i} className="flex items-center justify-between text-sm bg-white/[0.03] rounded-xl px-3.5 py-2.5 border border-amber-500/10">
+              <div key={i} className="flex items-center justify-between text-sm bg-slate-900/[0.03] dark:bg-white/[0.03] rounded-xl px-3.5 py-2.5 border border-amber-500/10">
                 <span className="flex items-center gap-2">
                   <span>{alert.category.icon}</span>
-                  <span className="font-medium text-slate-200">{alert.category.name}</span>
+                  <span className="font-medium text-slate-800 dark:text-slate-200">{alert.category.name}</span>
                 </span>
-                <span className="text-amber-400 font-semibold text-xs">{alert.percent_used.toFixed(0)}% used</span>
+                <span className="text-amber-600 dark:text-amber-400 font-semibold text-xs">{alert.percent_used.toFixed(0)}% used</span>
               </div>
             ))}
           </div>
@@ -90,7 +90,7 @@ export default function BudgetsPage() {
       {/* New budget form */}
       {showForm && (
         <div className="glass rounded-2xl p-5 animate-slide-up border-violet-500/20">
-          <p className="font-semibold text-white mb-4 text-sm">New Budget</p>
+          <p className="font-semibold text-slate-900 dark:text-white mb-4 text-sm">New Budget</p>
           <div className="grid grid-cols-2 gap-3 mb-4">
             <select
               value={formData.category_id}
@@ -147,11 +147,11 @@ export default function BudgetsPage() {
         ))}
         {(!budgets || budgets.length === 0) && (
           <div className="col-span-3 glass rounded-2xl p-16 text-center">
-            <div className="w-12 h-12 rounded-2xl bg-white/[0.04] border border-white/[0.07] flex items-center justify-center mx-auto mb-4">
-              <Wallet size={20} className="text-slate-600" />
+            <div className="w-12 h-12 rounded-2xl bg-slate-900/[0.04] dark:bg-white/[0.04] border border-slate-900/[0.07] dark:border-white/[0.07] flex items-center justify-center mx-auto mb-4">
+              <Wallet size={20} className="text-slate-400 dark:text-slate-600" />
             </div>
-            <p className="font-semibold text-slate-300 text-sm">No budgets set</p>
-            <p className="text-slate-600 text-xs mt-1.5">Click &quot;Set Budget&quot; to start tracking your spending limits</p>
+            <p className="font-semibold text-slate-700 dark:text-slate-300 text-sm">No budgets set</p>
+            <p className="text-slate-500 dark:text-slate-600 text-xs mt-1.5">Click &quot;Set Budget&quot; to start tracking your spending limits</p>
           </div>
         )}
       </div>

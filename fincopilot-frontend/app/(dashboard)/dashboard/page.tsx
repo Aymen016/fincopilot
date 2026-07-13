@@ -15,36 +15,36 @@ import Link from "next/link";
 
 const ACCENT = {
   violet: {
-    icon: "text-violet-400",
+    icon: "text-violet-600 dark:text-violet-400",
     iconBg: "bg-violet-500/20",
     bar: "from-violet-500 to-violet-400",
     border: "hover:border-violet-500/30",
     glow: "hover:shadow-[0_8px_32px_rgba(124,58,237,0.2)]",
-    value: "text-violet-300",
+    value: "text-violet-700 dark:text-violet-300",
   },
   emerald: {
-    icon: "text-emerald-400",
+    icon: "text-emerald-600 dark:text-emerald-400",
     iconBg: "bg-emerald-500/20",
     bar: "from-emerald-500 to-emerald-400",
     border: "hover:border-emerald-500/30",
     glow: "hover:shadow-[0_8px_32px_rgba(16,185,129,0.2)]",
-    value: "text-emerald-300",
+    value: "text-emerald-700 dark:text-emerald-300",
   },
   sky: {
-    icon: "text-sky-400",
+    icon: "text-sky-600 dark:text-sky-400",
     iconBg: "bg-sky-500/20",
     bar: "from-sky-500 to-sky-400",
     border: "hover:border-sky-500/30",
     glow: "hover:shadow-[0_8px_32px_rgba(14,165,233,0.2)]",
-    value: "text-sky-300",
+    value: "text-sky-700 dark:text-sky-300",
   },
   amber: {
-    icon: "text-amber-400",
+    icon: "text-amber-600 dark:text-amber-400",
     iconBg: "bg-amber-500/20",
     bar: "from-amber-500 to-amber-400",
     border: "hover:border-amber-500/30",
     glow: "hover:shadow-[0_8px_32px_rgba(251,191,36,0.2)]",
-    value: "text-amber-300",
+    value: "text-amber-700 dark:text-amber-300",
   },
 };
 
@@ -69,8 +69,8 @@ function StatCard({
       <p className={`text-2xl font-bold tracking-tight mb-1.5 ${a.value}`}>{value}</p>
       {sub && (
         <p className="text-xs text-slate-500 flex items-center gap-1">
-          {trend === "up" && <ArrowUpRight size={11} className="text-rose-400" />}
-          {trend === "down" && <ArrowDownRight size={11} className="text-emerald-400" />}
+          {trend === "up" && <ArrowUpRight size={11} className="text-rose-600 dark:text-rose-400" />}
+          {trend === "down" && <ArrowDownRight size={11} className="text-emerald-600 dark:text-emerald-400" />}
           {sub}
         </p>
       )}
@@ -122,12 +122,12 @@ export default function DashboardPage() {
               <div className="w-5 h-5 rounded-md bg-brand-gradient flex items-center justify-center">
                 <Sparkles size={11} className="text-white" />
               </div>
-              <span className="text-xs font-semibold text-violet-400 uppercase tracking-widest">Overview</span>
+              <span className="text-xs font-semibold text-violet-600 dark:text-violet-400 uppercase tracking-widest">Overview</span>
             </div>
-            <h1 className="text-2xl font-bold text-white tracking-tight">
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
               {firstName ? `Good to see you, ${firstName} 👋` : "Dashboard"}
             </h1>
-            <p className="text-sm text-slate-400 mt-0.5">{monthName} {now.getFullYear()} · Financial overview</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">{monthName} {now.getFullYear()} · Financial overview</p>
           </div>
           <Link href="/expenses/new" className="btn-brand px-4 py-2.5 text-sm">
             <Plus size={15} /> Add Expense
@@ -166,15 +166,15 @@ export default function DashboardPage() {
         {risk?.risk_flags?.length > 0 && (
           <div className="glass rounded-2xl p-4 flex items-start gap-3 border-amber-500/20 bg-amber-500/[0.06] animate-fade-in">
             <div className="w-9 h-9 rounded-xl bg-amber-500/20 flex items-center justify-center flex-shrink-0">
-              <AlertTriangle size={16} className="text-amber-400" />
+              <AlertTriangle size={16} className="text-amber-600 dark:text-amber-400" />
             </div>
             <div className="flex-1">
-              <p className="text-sm font-bold text-amber-300">Forecast Warning</p>
-              <p className="text-xs text-amber-500/80 mt-0.5 leading-relaxed">
+              <p className="text-sm font-bold text-amber-700 dark:text-amber-300">Forecast Warning</p>
+              <p className="text-xs text-amber-700/80 dark:text-amber-500/80 mt-0.5 leading-relaxed">
                 {risk.risk_flags.map((f: any) => `${f.category_name} may exceed budget by ${formatCurrency(f.overspend_by)}`).join(" · ")}
               </p>
             </div>
-            <Link href="/forecast" className="text-xs font-bold text-amber-400 hover:text-amber-300 whitespace-nowrap transition-colors px-2">
+            <Link href="/forecast" className="text-xs font-bold text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 whitespace-nowrap transition-colors px-2">
               View →
             </Link>
           </div>
@@ -186,7 +186,7 @@ export default function DashboardPage() {
           <div className="glass p-5 rounded-2xl flex flex-col items-center justify-center relative overflow-hidden"
             style={{ animationDelay: "100ms", animationFillMode: "both" }}>
             <div className="absolute inset-0 bg-gradient-to-br from-violet-600/5 to-transparent pointer-events-none" />
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 self-start relative z-10">Health Score</p>
+            <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-4 self-start relative z-10">Health Score</p>
             <div className="relative z-10">
               {score ? (
                 <HealthScoreRing score={score.score} grade={score.grade} trend={score.trend} />
@@ -199,12 +199,12 @@ export default function DashboardPage() {
           {/* Spending Donut */}
           <div className="glass p-5 rounded-2xl relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-br from-sky-600/5 to-transparent pointer-events-none" />
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 relative z-10">Spending by Category</p>
+            <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-4 relative z-10">Spending by Category</p>
             <div className="relative z-10">
               {monthExpenses?.items?.length ? (
                 <SpendingDonut expenses={monthExpenses.items} />
               ) : (
-                <div className="h-44 flex flex-col items-center justify-center gap-2 text-slate-600">
+                <div className="h-44 flex flex-col items-center justify-center gap-2 text-slate-400 dark:text-slate-600">
                   <Receipt size={24} className="opacity-40" />
                   <p className="text-sm">No expenses this month</p>
                 </div>
@@ -215,7 +215,7 @@ export default function DashboardPage() {
           {/* Trend */}
           <div className="glass p-5 rounded-2xl relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-br from-emerald-600/5 to-transparent pointer-events-none" />
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 relative z-10">Spending Trend</p>
+            <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-4 relative z-10">Spending Trend</p>
             <div className="relative z-10">
               <TrendLine />
             </div>
@@ -230,10 +230,10 @@ export default function DashboardPage() {
                 <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-violet-500 to-violet-600 flex items-center justify-center shadow-glow-sm">
                   <Zap size={13} className="text-white" />
                 </div>
-                <h2 className="text-sm font-bold text-white uppercase tracking-wider">AI Insights</h2>
+                <h2 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">AI Insights</h2>
                 <span className="badge badge-brand">{insights.length}</span>
               </div>
-              <Link href="/insights" className="text-xs font-bold text-violet-400 hover:text-violet-300 transition-colors">
+              <Link href="/insights" className="text-xs font-bold text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 transition-colors">
                 View all →
               </Link>
             </div>
@@ -250,36 +250,36 @@ export default function DashboardPage() {
         {/* Recent Transactions */}
         <div className="glass rounded-2xl overflow-hidden animate-fade-in-up" style={{ animationDelay: "300ms", animationFillMode: "both" }}>
           {/* Header with gradient */}
-          <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.05] bg-gradient-to-r from-white/[0.03] to-transparent">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-slate-900/[0.06] dark:border-white/[0.05] bg-gradient-to-r from-slate-900/[0.02] dark:from-white/[0.03] to-transparent">
             <div className="flex items-center gap-2.5">
-              <div className="w-7 h-7 rounded-lg bg-white/[0.07] flex items-center justify-center">
-                <TrendingUp size={13} className="text-slate-300" />
+              <div className="w-7 h-7 rounded-lg bg-slate-900/[0.05] dark:bg-white/[0.07] flex items-center justify-center">
+                <TrendingUp size={13} className="text-slate-600 dark:text-slate-300" />
               </div>
-              <h2 className="text-sm font-bold text-white uppercase tracking-wider">Recent Transactions</h2>
+              <h2 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">Recent Transactions</h2>
             </div>
-            <Link href="/expenses" className="text-xs font-bold text-violet-400 hover:text-violet-300 transition-colors">
+            <Link href="/expenses" className="text-xs font-bold text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 transition-colors">
               View all →
             </Link>
           </div>
 
           {recentExpenses?.items?.length ? (
-            <div className="divide-y divide-white/[0.04]">
+            <div className="divide-y divide-slate-900/[0.04] dark:divide-white/[0.04]">
               {recentExpenses.items.map((e: any, i: number) => (
                 <div
                   key={e.id}
-                  className="flex items-center justify-between py-3 px-5 hover:bg-white/[0.03] transition-colors group animate-fade-in"
+                  className="flex items-center justify-between py-3 px-5 hover:bg-slate-900/[0.03] dark:hover:bg-white/[0.03] transition-colors group animate-fade-in"
                   style={{ animationDelay: `${300 + i * 50}ms`, animationFillMode: "both" }}
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-white/[0.06] border border-white/[0.08] flex items-center justify-center text-base flex-shrink-0 group-hover:border-white/[0.12] transition-colors">
+                    <div className="w-9 h-9 rounded-xl bg-slate-900/[0.04] dark:bg-white/[0.06] border border-slate-900/[0.06] dark:border-white/[0.08] flex items-center justify-center text-base flex-shrink-0 group-hover:border-slate-900/[0.1] dark:group-hover:border-white/[0.12] transition-colors">
                       {e.category?.icon || "💰"}
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-slate-200">{e.description}</p>
-                      <p className="text-xs text-slate-600">{e.category?.name} · {e.expense_date}</p>
+                      <p className="text-sm font-medium text-slate-800 dark:text-slate-200">{e.description}</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-600">{e.category?.name} · {e.expense_date}</p>
                     </div>
                   </div>
-                  <span className="text-sm font-bold text-white tabular-nums">{formatCurrency(e.amount)}</span>
+                  <span className="text-sm font-bold text-slate-900 dark:text-white tabular-nums">{formatCurrency(e.amount)}</span>
                 </div>
               ))}
             </div>
