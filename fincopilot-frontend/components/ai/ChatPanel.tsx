@@ -41,9 +41,8 @@ export function ChatPanel({ onClose }: Props) {
     <div className="fixed bottom-6 right-6 w-96 h-[520px] flex flex-col z-50 animate-slide-in-right">
       {/* Glass panel */}
       <div
-        className="flex flex-col h-full rounded-2xl overflow-hidden border border-slate-900/[0.09] dark:border-white/[0.08]"
+        className="flex flex-col h-full rounded-2xl overflow-hidden border border-slate-900/[0.09] dark:border-white/[0.08] bg-[rgba(255,255,255,0.92)] dark:bg-[rgba(13,14,30,0.92)]"
         style={{
-          background: "rgba(13, 14, 30, 0.92)",
           backdropFilter: "blur(24px)",
           WebkitBackdropFilter: "blur(24px)",
           boxShadow: "0 24px 64px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.05), inset 0 1px 0 rgba(255,255,255,0.06)",
