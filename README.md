@@ -35,7 +35,10 @@
 ## 🎥 Walkthrough Video
 
 
-Uploading Fincopilot-walkthrough.mp4…
+
+
+https://github.com/user-attachments/assets/9ea64cbc-6d6f-4e62-8610-758e1d17c664
+
 
 
 
