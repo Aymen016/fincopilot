@@ -34,7 +34,8 @@
 
 ## 🎥 Walkthrough Video
 
-<video src="https://github.com/Aymen016/fincopilot/raw/main/Walkthrough/Fincopilot-walkthrough.mp4" controls width="100%"></video>
+https://github.com/user-attachments/assets/2dc1cbc9-792c-43fd-b267-e88e5444059b
+
 
 > If the player doesn't load, [watch/download the walkthrough directly](Walkthrough/Fincopilot-walkthrough.mp4).
 
