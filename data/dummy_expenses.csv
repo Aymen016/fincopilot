@@ -1,0 +1,33 @@
+Amount,Date,Description,Merchant,Category
+650,07/13/2026,Starbucks coffee,Starbucks,Coffee & Dining
+980,07/11/2026,McDonald's lunch,McDonald's,Coffee & Dining
+2400,07/09/2026,Pizza Hut dinner,Pizza Hut,Coffee & Dining
+550,07/07/2026,Cafe latte,Cafe Latte,Coffee & Dining
+1800,07/04/2026,KFC bucket,KFC,Coffee & Dining
+1200,06/30/2026,Biryani restaurant,Student Biryani,Coffee & Dining
+850,06/26/2026,Burger King,Burger King,Coffee & Dining
+180,06/24/2026,Tea & snacks,Dhaba,Coffee & Dining
+8500,07/12/2026,Carrefour weekly groceries,Carrefour,Groceries
+1800,07/05/2026,Vegetables & fruits,Sabzi Mandi,Groceries
+6200,06/28/2026,Supermarket run,Imtiaz Supermarket,Groceries
+1100,06/21/2026,Milk & dairy,Al-Fatah,Groceries
+450,07/13/2026,Uber ride,Uber,Transportation
+5000,07/08/2026,Fuel refill,PSO,Transportation
+1200,07/02/2026,Careem to airport,Careem,Transportation
+2500,06/16/2026,Monthly metro card,Metro Bus,Transportation
+1100,07/13/2026,Netflix subscription,Netflix,Subscriptions
+699,07/13/2026,Spotify Premium,Spotify,Subscriptions
+1800,07/06/2026,Cinema tickets x2,Cinepax,Entertainment
+549,06/29/2026,YouTube Premium,YouTube,Subscriptions
+8500,06/24/2026,PS5 game,GameXtreme,Entertainment
+6500,07/09/2026,Electricity bill,Lesco,Utilities
+2500,07/09/2026,Internet bill,PTCL,Utilities
+800,07/09/2026,Water bill,WASA,Utilities
+2200,07/10/2026,Pharmacy,Pharmacy - Block A,Health & Medical
+4000,06/16/2026,Gym membership,Gold's Gym,Health & Medical
+4500,07/11/2026,Daraz.pk order,Daraz.pk,Shopping
+7800,07/03/2026,New shoes,Bata,Shopping
+3200,06/25/2026,Clothing store,Outfitters,Shopping
+55000,07/13/2026,Monthly rent,Landlord,Housing
+1200,07/07/2026,Udemy course,Udemy,Education
+1800,06/22/2026,Books,Liberty Books,Education
