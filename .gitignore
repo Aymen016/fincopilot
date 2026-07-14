@@ -5,6 +5,9 @@
 *.pem
 *.key
 
+# ── Uncompressed walkthrough video (too large for GitHub, keep only the compressed one) ──
+Walkthrough/Fincopilot.mp4
+
 # ── Python ────────────────────────────────────────────────────────────────────
 __pycache__/
 *.py[cod]

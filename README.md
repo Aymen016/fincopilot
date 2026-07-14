@@ -31,6 +31,14 @@
 <img width="3411" height="1284" alt="Main Dashboard - Lighter UI" src="https://github.com/user-attachments/assets/4748168f-10a1-4eb9-881a-8f773d769551" />
 
 ---
+
+## 🎥 Walkthrough Video
+
+<video src="https://github.com/Aymen016/fincopilot/raw/main/Walkthrough/Fincopilot-walkthrough.mp4" controls width="100%"></video>
+
+> If the player doesn't load, [watch/download the walkthrough directly](Walkthrough/Fincopilot-walkthrough.mp4).
+
+---
 ## 🖼️ Tech Stack
 
 ```
