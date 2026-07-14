@@ -28,7 +28,7 @@
 | **PKR Currency** | All amounts formatted in Pakistani Rupees (₨) — built for local use |
 
 ---
-<img width="3435" height="1255" alt="image" src="https://github.com/user-attachments/assets/ad349f79-f60f-4c20-b68b-be1015307112" />
+<img width="3411" height="1284" alt="Main Dashboard - Lighter UI" src="https://github.com/user-attachments/assets/4748168f-10a1-4eb9-881a-8f773d769551" />
 
 ---
 ## 🖼️ Tech Stack
